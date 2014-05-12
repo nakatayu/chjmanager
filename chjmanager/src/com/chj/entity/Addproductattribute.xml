@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Addproductattribute">
+	<typeAlias alias="Addproductattribute" type="com.chj.entity.Addproductattribute" />
+	<resultMap class="Addproductattribute"  id="AddproductattributeRes">
+		<result property="appendId" column="append_id" />
+		<result property="name" column="name" />
+		<result property="price" column="price" />
+		<result property="parentId" column="parent_id" />
+		<result property="companyId" column="company_id" />
+		<result property="needCount" column="need_count" />
+		<result property="isCkeckbox" column="is_ckeckbox" />
+		
+		<result property="child" column="append_id"  select="queryProductAttributeChild" />
+		
+	</resultMap>
+<!-- 保存商品附加属性名称 -->
+	<insert id="insertProductAttribute" parameterClass="Addproductattribute">
+INSERT INTO tb_append(
+			name
+		<isNotEmpty prepend="," property="price">
+			price
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="parentId">
+			parent_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="isCkeckbox">
+			is_ckeckbox
+		</isNotEmpty>)
+        VALUES(
+			#name#
+		<isNotEmpty prepend="," property="price">
+			#price#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="parentId">
+			#parentId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="isCkeckbox">
+			#isCkeckbox#
+		</isNotEmpty>)
+		<selectKey keyProperty="appendId" resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>	
+	
+<!-- 删除商品附加属性 -->
+ <!-- 	<delete id="delProductAttribute" parameterClass="java.util.HashMap">
+		DELETE FROM tb_append WHERE append_id = #appendId#
+	</delete>  -->
+	<update id="delProductAttribute" parameterClass="java.util.HashMap">
+			UPDATE tb_append SET delete_flag = 2  WHERE   append_id = #appendId#
+	</update>
+	
+	<select id="queryProductAttributeChild" parameterClass="Long" resultClass="java.util.HashMap">
+		select append_id as appendId ,name  from tb_append t where t.parent_id=#value# and delete_flag= 1
+	</select>
+	
+	<!-- 商品属性分页 -->
+  <select id="queryProductAttributeCount" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+		select count(*)  from tb_append t where t.parent_id=0 and delete_flag= 1
+		<dynamic>
+			   <isNotEmpty prepend="AND" property="companyId"> 
+				(company_id= #companyId#)
+				</isNotEmpty>
+					<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+	<!-- 商品口味（附加属性） -->
+ <select id="queryProductAppend" parameterClass="java.util.HashMap" resultMap="AddproductattributeRes">	
+		select top $size$ *  from (select row_number()over(order by
+		append_id desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_append t where t.parent_id=0 and delete_flag= 1
+		<dynamic >
+			   <isNotEmpty prepend="AND" property="companyId"> 
+				(company_id= #companyId#)
+				</isNotEmpty>
+					<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+		order by append_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	
+	
+	<!-- 商品属性分页   开发区-->
+  <select id="findCompanyManagerProductAttributeListCount" parameterClass="java.util.HashMap" resultClass="java.lang.Long">
+		select count(*)  from tb_append t where t.parent_id=0 and delete_flag= 1
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+	</select>
+	
+	<!-- 商品口味（附加属性）   开发区-->
+ <select id="findCompanyManagerProductAttributeList" parameterClass="java.util.HashMap" resultMap="AddproductattributeRes">	
+		select top $size$ *  from (select row_number()over(order by
+		append_id desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_append t
+		 where  t.parent_id=0  and  delete_flag= 1
+		   <isNotEmpty prepend="AND" property="companyId"> 
+				(company_id= #companyId#)
+				</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		order by append_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+</sqlMap>
+
+

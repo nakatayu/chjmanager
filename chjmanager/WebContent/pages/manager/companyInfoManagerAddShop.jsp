@@ -1,0 +1,1334 @@
+<%@page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ include file="/common/checklogin.jsp"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+
+<head>
+<title>服务供应商维护</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="${ctx}/css/bootstrap.min.css" />
+<link rel="stylesheet" href="${ctx}/css/bootstrap-responsive.min.css" />
+<link rel="stylesheet" href="${ctx}/css/uniform.css" />
+<link rel="stylesheet" href="${ctx}/css/select2.css" />
+<link rel="stylesheet" href="${ctx}/css/matrix-style.css" />
+<link rel="stylesheet" href="${ctx}/css/matrix-media.css" />
+<link href="${ctx}/font-awesome/css/font-awesome.css" rel="stylesheet" />
+<link
+	href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800'
+	rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="${ctx}/css/colorpicker.css" />
+<link rel="stylesheet" href="${ctx}/css/datepicker.css" />
+<link rel="stylesheet" href="${ctx}/css/bootstrap-wysihtml5.css" />
+<link rel="stylesheet" href="${ctx}/css/pager.css" />
+<style type="text/css">
+.tag_content {
+	margin: 0px;
+	padding: 2px 0 2px 0;
+	list-style: none;
+	line-height: 20px;
+	font-size: 15px;
+}
+
+.shop_announcement {
+	width: 486px;
+	high: 57px;
+	overflow-x: visible;
+	overflow-y: visible;
+}
+
+#a1 {
+	background-color: skyblue
+}
+
+[titie~=labelstyle] {
+	font-size: 20px;
+}
+
+.tdstyle {
+	font-color: 20px;
+}
+
+.spanstyle {
+	font-color: red;
+}
+</style>
+
+
+
+</head>
+<body>
+	<jsp:include page="/common/head.jsp"></jsp:include>
+	<jsp:include page="/common/leftmenue.jsp"></jsp:include>
+
+	<div id="content">
+		<div id="content-header">
+			<div id="breadcrumb">
+				<a href="../index.jsp" title="主页" class="tip-bottom"><i
+					class="icon-home"></i> 主页</a> <a href="./ShopList.jsp" title="店铺设置"
+					class="tip-bottom"><i class="icon icon-signal"></i> 店铺设置</a> <a href="#"
+					class="current">店铺信息</a>
+			</div>
+		</div>
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="widget-box">
+						<div class="widget-title">
+							<span class="icon"> <i class="icon-info-sign"></i>
+							</span>
+							<h5>店铺详情</h5>
+						</div>
+
+						<div class="widget-content nopadding">
+							<form class="form-horizontal" method="post"
+								action="${ctx}/shop!insertShopInfo.action" name="basic_validate"
+								id="basic_validate" novalidate="novalidate">
+							<input type="hidden" id="companyId" name="companyId"  /> 		
+<!-- <br>
+								<h5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;公共类目：</h5>
+								<hr>
+								<table>
+												<tr>
+											<td></td>
+											<td align="left" valign="bottom"
+												style="height: 15px; font-size: 15px; padding: 10px;">公共分类：</td>
+											<td align="left" valign="bottom"
+												style="height: 15px; font-size: 15px; padding: 10px;">所属分类：</td>
+										</tr>
+									<tr>
+										<td style="width: 10%"></td>
+										<td style="width: 27%;">
+											<div
+												style="width: 270px; height: 200px; overflow: auto; border-style: solid; border-width: 1px; border-color: gray;"
+												class="tag_content">
+												<ul id="Shopstairtag">
+												</ul>
+											</div>
+										</td>
+										<td style="width: 27%">
+											<div class="control-group">
+												<div
+													style="width: 270px; height: 200px; overflow: auto; border-style: solid; border-width: 1px; border-color: gray;"
+													class="tag_content">
+													<ul id="Thirdshoptag">
+													</ul>
+												</div>
+											</div>
+										</td>
+										<td style="width: 27%"></td>
+									</tr>
+								</table>
+								<div class="control-group"
+									style="margin: 20px 0 20px 0; height: 0px;">
+										<label class="control-label">已选分类：</label> <input
+											name="categoryId" id="categoryId" type="hidden">
+										<div class="controls" id="delchoosenclassify"
+											titie="labelstyle"></div>
+									</div>-->
+							<br> 
+								<h5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;基本信息：</h5>
+								<hr>
+									<table>
+										<tr>
+												<td>
+												  		<div id="form-wizard-1" class="step">
+															<div class="control-group">
+																<label class="control-label">店铺编号：</label>
+																<div class="controls"  style="width: 340px;">
+																	<input id="shopNumber" name="shopNumber" type="text"  readonly 
+																		style="width: 254px;" />
+																</div>
+															</div>
+														</div>
+												</td>
+												<td>
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;		
+												</td>
+												<td></td>
+												<td  rowspan="7" align=center>
+																	<div
+																		style="width: 150px; height: 280px; margin: 10px 0 0 30px; border: 1px solid #ccc; float: center;">
+																		<img style="width: 150px; height: 160px;" id="imgCompany" 
+																			/> <input type="hidden"
+																			id="uploadUrl" name="logo"> <br />
+																		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																		&nbsp;&nbsp;&nbsp;&nbsp;<br /> <br /> <br />
+																		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																		&nbsp;&nbsp;&nbsp;&nbsp;
+																		<button id="uploadButton" class="btn btn-primary"
+																			style="background: #339999">浏&nbsp;&nbsp;&nbsp;&nbsp;览</button>
+																		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+																	</div>
+																<span style="margin: 0px 0 0 40px;"><font color="red" >推荐尺寸:230*230</font></span>	
+												</td>
+										</tr>
+											<tr>
+												<td>	
+															<div id="form-wizard-1" class="step">
+																<div class="control-group">
+																	<label class="control-label">店铺名称：</label>
+																	<div class="controls">
+																		<input id="name" name="name" type="text"
+																			style="width: 254px;" onblur="nameOnBlur()" /> <span><font
+																			color="red" id="name_check"> </font></span>
+																	</div>
+																</div>
+															</div>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr>
+												<td>	
+															<div class="control-group">
+													<label class="control-label">店铺类型：</label>
+													<div class="controls">
+													<select id="shopType" name="shopType"  
+																style="width: 262px;"  onclick="shopType(this)">
+																<option selected value=-1>--请选择--</option>
+															</select>
+													</div>
+												</div>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr>
+												<td>	
+														<div class="control-group">
+																<label class="control-label">支持外送：</label>
+																<div class="controls">
+																	<table>
+																		<tr>
+																			<td><label> 是<input type="radio"  onchange="disabledOutSend()"
+																					id="deliverOk" name="deliverOk" value="T" />
+																			</label></td>
+																			<td><label> 否<input type="radio"  onchange="disabledOutSend()"
+																					id="deliverNo" name="deliverOk" value="F" />
+																			</label>
+																		</td>
+																	</tr>
+																</table>
+															</div>
+														</div>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr>
+												<td>	
+														<div class="control-group">
+															<label class="control-label">终端设备自动接收订单：</label>
+															<div class="controls">
+																<table>
+																	<tr>
+																		<td><label> 是<input type="radio"
+																				id="terminalOk" name="terminalOk" value="T" />
+																		</label></td>
+																		<td><label> 否<input type="radio"
+																				id="terminalOk" name="terminalOk" value="F" />
+																		</label></td>
+																	</tr>
+																</table>
+															</div>
+														</div>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>
+											<tr>
+												<td>	
+															<div class="control-group">
+																<label class="control-label">联系人：</label>
+																<div class="controls">
+																	<input id="linkman" type="text" name="linkman"
+																		style="width: 250px;" onblur="linkmanOnBlur()" /> <span><font
+																		color="red" id="linkman_check"> </font></span>
+																</div>
+															</div>
+												</td>
+												<td></td>
+												<td></td>
+												<td></td>
+											</tr>	
+											</table>
+														<div id="form-wizard-1" class="step">
+															<div class="control-group">
+																<label class="control-label">联系电话：</label>
+																<div class="controls">
+																	<input id="linkmanTel" type="text" name="linkmanTel"
+																		style="width: 250px;" onblur="linkmanTelOnBlur()" /> <span><font
+																		color="red" id="linkmanTel_check"> </font></span>
+																</div>
+															</div>
+														</div>	
+												<div class="control-group">
+													<label class="control-label">起送费：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder=""
+																onblur="sendpriceOnBlur()" style="width: 250px;"
+																id="sendPrice" name="sendPrice">
+														</div>
+														<span><font color="red" id="sendPrice_check"></font></span>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">外送费：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text"
+																onblur="deliverMoneyOnBlur()" style="width: 250px;"
+																id="deliverMoney" name="deliverMoney">
+														</div>
+														<span><font color="red" id="deliverMoney_check">
+														</font></span>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">人均消费：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder=""
+																onblur="consumptionPerOnBlur()" style="width: 250px;"
+																id="consumptionPer" name="consumptionPer">
+														</div>
+														<span><font color="red" id="consumptionPer_check">
+														</font></span>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">预计送达时间：</label>
+													<div class="controls">
+														<select name="sendTime" id="sendTime"  readonly 
+															style="width: 262px;">
+															<option id="sendTime" value="-1" >--请选择--</option>
+															<option id="sendTime" value="1">30分钟以内</option>
+															<option id="sendTime" value="2">60分钟以内</option>
+															<option id="sendTime" value="3">90分钟以内</option>
+															<option id="sendTime" value="4">请电话确认</option> 
+														</select>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">支付方式：</label>
+													<div class="controls">
+														<table>
+															<tr>
+																<label for="到店支付"> <input type="checkbox"
+																	name="payType" id="payType" value="1" /> 到店支付
+																</label>
+															</tr>
+															<tr>
+																<label for="货到付款（现金）"> <input type="checkbox"
+																	id="payType" name="payType" value="2" /> 货到付款（现金）
+																</label>
+															</tr>
+															<tr>
+																<label for="货到付款(一卡通)"> <input type="checkbox"
+																	id="payType" name="payType" value="3" /> 货到付款(一卡通)
+																</label>
+															</tr>
+															<tr>
+																<label for="货到付款(银行卡)"> <input type="checkbox"
+																	id="payType" name="payType" value="4" /> 货到付款(银行卡)
+																</label>
+															</tr>
+															<tr>
+																<label for="线上支付(一卡通)"> <input type="checkbox"
+																	id="payType" name="payType" value="5" /> 线上支付(一卡通)
+																</label>
+															</tr>
+															<tr>
+																<label for="线上支付(银行卡)"> <input type="checkbox"
+																	id="payType" name="payType" value="6" /> 线上支付(银行卡)
+																</label>
+															</tr>
+														</table>
+													</div>
+												</div>
+												
+												<c:if test="${personnel.commpanyId==254}">
+												<h5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;配送范围：</h5>
+												<hr>
+													 <div class="control-group"  style="padding:0 0 0 60px;">
+															<table id="customizeFlavors">
+
+															</table>
+													 </div> 
+												<br>
+											</c:if>
+											<input type="hidden" id="distributionArea" name="thirdServiceArea">
+												
+												<div class="control-group">
+													<div class="controls">
+														<table>
+															<tr id="secondAreaId">
+															</tr>
+														</table>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">园区名称：</label>
+													<div class="controls">
+														<table id="thirdAreaId"></table>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">营业时间：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder="" class="span11"
+																style="width: 262px;" id="workTime"
+																onblur="workTimeOnBlur()" name="workTime">
+														</div>
+														<span><font color="red" id="workTime_check">
+														</font></span>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">外送时间：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder="" class="span11"
+																style="width: 262px;" id="serviceTime"
+																onblur="serviceTimeOnBlur()" name="serviceTime">
+															<button type="button" style="margin: 4px 4px 4px 4px"
+																onclick="addServiceTime()">+</button>
+															<button onclick="delServiceTime()" type="button">-</button>
+														</div>
+														<span><font color="red" id="serviceTime_check1"
+															name="serviceTime_check">可以使用&进行分隔，如：上午08:00-12:00&下午14:00-20:00 </font></span>
+													</div>
+													<div id="addServiceTimeId"></div>
+												</div>
+													<div id="form-wizard-1" class="step">
+													<div class="control-group">
+														<label class="control-label">店铺地址：</label>
+														<div class="controls">
+															<select id="detailedAddress" name="areaId"
+																style="width: 160px;" onclick="addressStreet(this)">
+															</select> <input type="text" id="address" style="width: 322px;"
+																name="address">
+														</div>
+													</div>
+												<div class="control-group">
+													<label class="control-label">店铺经度：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder=" " class="span11"
+																style="width: 262px;" id="lng" onblur="lngOnBlur()"
+																name="lng">
+														</div>
+														<span><font color="red" id="lng_check"> </font></span>
+													</div>
+												</div>
+												<div class="control-group">
+													<label class="control-label">店铺纬度：</label>
+													<div class="controls">
+														<div class="input-append">
+															<input type="text" placeholder=" " class="span11"
+																onblur="latOnBlur()" style="width: 262px;" id="lat"
+																name="lat">
+														</div>
+														<span><font color="red" id="lat_check"></font></span>
+													</div>
+												</div>
+													<div class="shop_announcement">
+														<label class="control-label">店铺介绍：</label>
+														<div class="controls" style="height: 100px">
+															<textarea type="text" name="content"
+																onblur="contentOnBlur()" class="shop_announcement"
+																style="height: 100px" id="content11"></textarea>
+															<span><font color="red" id="content_check">
+															</font></span>
+														</div>
+													</div>
+												</div>
+												<br>
+											<h5>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;商品标签：</h5>
+											<hr>
+											<table>
+												<tr>
+													<td style="font-weight: normal;"></td>
+													<td align="left" valign="bottom"
+														style="height: 15px; font-size: 15px; padding: 10px;">标签分类：</td>
+													<td align="left" valign="bottom"
+														style="height: 15px; font-size: 15px; padding: 10px;">标签名称：</td>
+												</tr>
+												<tr>
+													<td style="width: 10%"></td>
+													<td style="width: 27%">
+														<div
+															style="width: 270px; height: 200px; overflow: auto; border-style: solid; border-width: 1px; border-color: gray;"
+															class="tag_content">
+															<ul id="tagSecond">
+															</ul>
+														</div>
+													</td>
+													<td style="width: 27%">
+														<div
+															style="width: 270px; height: 200px; overflow: auto; border-style: solid; border-width: 1px; border-color: gray;"
+															class="tag_content">
+															<ul id="tagThird">
+															</ul>
+														</div>
+													</td>
+													<td style="width: 27%"></td>
+												</tr>
+											</table>
+											<div class="control-group" style="height: 68px;">
+												<label class="control-label" style="height: 30px;">已选标签：</label> <input
+													name="thirdCategoryTag" id="thirdCategoryTag" type="hidden">
+												<div class="controls" id="choosenLabel" titie="labelstyle" style="height: 30px;">
+												</div>
+											</div>
+
+												<div class="form-actions">
+													<button class="btn btn-warning" type="button"
+														class="btn btn-success" onclick="saveShop()">确认保存</button>
+													&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+													<button class="btn btn-warning" type="button"
+														onclick="location.reload()">&nbsp;&nbsp;&nbsp;&nbsp;置&nbsp;&nbsp;&nbsp;&nbsp;空&nbsp;&nbsp;&nbsp;&nbsp;</button>
+												</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<script src="${ctx}/js/jquery.min.js"></script>
+			<script src="${ctx}/js/jquery.ui.custom.js"></script>
+			<script src="${ctx}/js/bootstrap.min.js"></script>
+			<script src="${ctx}/js/jquery.uniform.js"></script>
+			<script src="${ctx}/js/select2.min.js"></script>
+			<script src="${ctx}/js/jquery.validate.js"></script>
+			<script src="${ctx}/js/matrix.js"></script>
+			<script src="${ctx}/js/matrix.form_validation.js"></script>
+			<script src="${ctx}/js/bootstrap-datepicker.js"></script>
+			<script src="${ctx}/js/wysihtml5-0.3.0.js"></script>
+			<script src="${ctx}/js/jquery.peity.min.js"></script>
+			<script src="${ctx}/js/bootstrap-wysihtml5.js"></script>
+			<script src="${ctx}/js/bootstrap-colorpicker.js"></script>
+			<script src="${ctx}/js/masked.js"></script>
+			<script src="${ctx}/js/jquery.toggle.buttons.html"></script>
+			<script src="${ctx}/js/myself/ajaxupload.js"></script>
+			<%--<script src="${ctx}/js/matrix.form_common.js"></script>  --%>
+			<script>
+				$('.textarea_editor').wysihtml5();
+			</script>
+
+			<jsp:include page="/common/buttom.jsp"></jsp:include>
+			<script src="${ctx}/js/jquery.pager.js"></script>
+</body>
+</html>
+
+<script type="text/javascript">
+var companyId = <%=request.getParameter("companyId")%>
+$("#companyId").val(companyId);
+	$(function() {
+		//配送范围
+		/* if('${personnel.getty}'=='254'){ */
+			$.ajax({
+						type : "post",
+						url : '${ctx}/product!CustomizeFlavors.action',
+						dataType : 'json',
+						timeout : 10000,
+						success : function(msg, status) {
+							if (msg.status == 200) {
+								var array = [];
+								for ( var i = 0; i < msg.rows.length; i++) {
+									if (msg.rows[i]["parent_id"] == 0) {
+										array.push("<tr><td><label calss='label'>"
+												+ msg.rows[i]["name"]+':'
+												+ "</label></td></tr>");
+										for ( var h = 0; h < msg.rows.length; h++) {
+											if (msg.rows[i]["append_id"] == msg.rows[h]["parent_id"]) {
+													array.push("<td align='right'><label calss='label'>"
+															+ msg.rows[h]["name"]
+															+ "<input type='checkbox' value='"+msg.rows[h]["append_id"]+"'   /></label></td>");
+											}
+										}
+										$('#customizeFlavors').html(array.join(''));
+									}
+								}
+							}
+						}
+					});
+	
+	
+		// 店铺类型 下拉框 
+		$.ajax({
+			type : "post",
+			url : '${ctx}/shop!findShopType.action',
+			dataType : 'json',
+			timeout : 10000,
+			success : function(msg, status) {
+				if (msg.status == 200) {
+					var array = [];
+					array.push('<option  selected value=-1>--请选择--</option> ');
+					for ( var i = 0; i < msg.rows.length; i++) {
+						array.push('<option  class="tag_content"');
+						array.push('	 value="' + msg.rows[i]["name"] + '">'
+								+ msg.rows[i]["name"] + '</option>');
+					}
+					$('#shopType').html(array.join(''));
+				} else
+					alert(msg.msg);
+			}
+		});
+		
+		//标签分类 1级 
+		$.ajax({
+					type : "post",
+					url : '${ctx}/tag!findTagSecondList.action',
+					dataType : 'json',
+					//      data :{tagId:tagid},   
+					timeout : 10000,
+					success : function(msg, status) {
+						if (msg.status == 200) {
+							var array = [];
+							for ( var i = 0; i < msg.rows.length; i++) {
+								array
+										.push('<li class="tag_content"	onclick="tagname(this)" onmouseover="this.id=\'a1\' " onmouseout="this.id=\'this\'"');
+								array.push('	 value="' + msg.rows[i]["tagId"]
+										+ '">' + msg.rows[i]["tagName"]
+										+ '</li>')
+							}
+							$('#tagSecond').html(array.join(''));
+						} else
+							alert(msg.msg);
+					}
+				});
+		//公共分类 1级 
+		$.ajax({
+					type : "post",
+					url : '${ctx}/category!findShopstairtagList.action',
+					dataType : 'json',
+					timeout : 10000,
+					success : function(msg, status) {
+						if (msg.status == 200) {
+							var array = [];
+							for ( var i = 0; i < msg.rows.length; i++) {
+								array
+										.push('<li class="tag_content"	onclick="commonalityclassifyvalue(this)" onmouseover="this.id=\'a1\' " onmouseout="this.id=\'this\'"');
+								array.push('	 value="'
+										+ msg.rows[i]["productCategoryId"]
+										+ '">' + msg.rows[i]["Name"] + '</li>')
+							}
+							$('#Shopstairtag').html(array.join(''));
+						} else
+							alert(msg.msg);
+					}
+				});
+
+		// 服务范围 下拉框 1级
+		$.ajax({
+			type : "post",
+			url : '${ctx}/area!findArea.action',
+			dataType : 'json',
+			timeout : 10000,
+			success : function(msg, status) {
+				if (msg.status == 200) {
+					var array = [];
+					array.push('<option  selected value=-1>--请选择--</option> ');
+					for ( var i = 0; i < msg.rows.length; i++) {
+						//alert(msg.rows[i]["areaName"]);
+						array.push('<option    class="tag_content"');
+						array.push('	 value="' + msg.rows[i]["areaId"] + '">'
+								+ msg.rows[i]["areaName"] + '</option>');
+					}
+					$('#area').html(array.join(''));
+				} else
+					alert(msg.msg);
+			}
+		});
+
+		//地址  下拉框 
+		$.ajax({
+			type : "post",
+			url : '${ctx}/area!findDetailedAddress.action',
+			dataType : 'json',
+			timeout : 10000,
+			success : function(msg, status) {
+				if (msg.status == 200) {
+					var array = [];
+					array.push('<option  selected value=-1>--请选择--</option> ');
+					for ( var i = 0; i < msg.rows.length; i++) {
+						array.push('<option   class="tag_content"  ');
+						array.push('	 value="' + msg.rows[i]["areaId"] + '">'
+								+ msg.rows[i]["areaName"] + '</option>');
+						$("#detailedAddress").data(
+								"'" + msg.rows[i]["areaId"] + "'",
+								msg.rows[i]["detailedAddress"] + "#"
+										+ msg.rows[i]["lat"] + "#"
+										+ msg.rows[i]["lng"])
+					}
+					$('#lat').html(array.join(''))
+					$('#lng').html(array.join(''));
+					$('#detailedAddress').html(array.join(''));
+				} else
+					alert(msg.msg);
+			}
+		});
+
+		//生成店铺编号  
+		$.ajax({
+			type : "post",
+			url : '${ctx}/shop!generateShopCode.action',
+			dataType : 'json',
+			data : {
+				companyId:companyId,	
+			},
+			timeout : 10000,
+			success : function(msg, status) {
+				if (msg.status == 200) {
+					$("#shopNumber").val(msg.rows);
+				} else
+					alert(msg.msg);
+			}
+		});
+		
+		
+		// 创建AJAX方式上传文件
+		var $uploadBtn = $("#uploadButton");
+		new AjaxUpload($uploadBtn, {
+			action : '${ctx}/user!uploadImage.action',
+			name : 'upfile',
+			responseType : 'json',
+			onSubmit : function(file, ext) {
+				//ext 文件后缀
+			},
+			onComplete : function(file, response) {
+				if (response.status == 200) {
+					$("#uploadUrl").val(response.rows);
+					$("#imgCompany").attr("src", "${http_img}" + response.rows);
+				} else {
+					alert(response.msg);
+				}
+			}
+		});
+	});
+	//标签名称  2级
+	function tagname(li) {
+		var tagid = $(li).attr("value");
+		$.ajax({
+					type : "post",
+					url : '${ctx}/tag!findTagThirdList.action',
+					dataType : 'json',
+					data : {
+						tagId : tagid
+					},
+					timeout : 10000,
+					success : function(msg, status) {
+						if (msg.status == 200) {
+							var array = [];
+							for ( var i = 0; i < msg.rows.length; i++) {
+								array
+										.push('<li class="tag_content"	onclick="selected(this)" onmouseover="this.id=\'a1\' " onmouseout="this.id=\'this\'"');
+								array.push('	 value="' + msg.rows[i]["tagId"]
+										+ '">' + msg.rows[i]["tagName"]
+										+ '</li>')
+							}
+							$('#tagThird').html(array.join(''));
+						} else
+							alert(msg.msg);
+					}
+				});
+	}
+
+	var count = 1;
+	function selected(li) {
+		if (count > 6) {
+			alert("不能超过6个");
+			return;
+		}
+		var currentLabel = $(li).val();//判断是否重复 
+		var flag = true;
+		$("#choosenLabel").find("span").each(function() {
+			if ($(this).attr("value") == currentLabel) {
+				alert("标签不可重复");
+				flag = false;
+			}
+		});
+		if (flag == true) {
+			count = count + 1;
+			$("#choosenLabel")
+					//已选标签 
+					.append(
+							"<span  value="
+									+ $(li).attr("value")
+									+ ">"
+									+ $(li).text()
+									+ "</span><a onclick='delLabel(this)'>[X]&nbsp;&nbsp;</a>");
+		}
+	}
+
+	function delLabel(li) {
+		count = count - 1;
+		$(li).prev().remove();
+		$(li).remove();
+	}
+
+	//分类名称  2级 
+	function commonalityclassifyvalue(li) {
+		var shoptag = $(li).attr("value");
+		$
+				.ajax({
+					type : "post",
+					url : '${ctx}/category!findCategory.action',
+					dataType : 'json',
+					data : {
+						shoptagId : shoptag
+					},
+					timeout : 10000,
+					success : function(msg, status) {
+						if (msg.status == 200) {
+							var array = [];
+							for ( var i = 0; i < msg.rows.length; i++) {
+								array
+										.push('<li class="tag_content"	onclick="shoptag(this)" onmouseover="this.id=\'a1\' " onmouseout="this.id=\'this\'"');
+								array.push('	 value="'
+										+ msg.rows[i]["productCategoryId"]
+										+ '">' + msg.rows[i]["Name"] + '</li>')
+							}
+							$('#Thirdshoptag').html(array.join(''));
+						} else
+							alert(msg.msg);
+					}
+				});
+	}
+
+	function submit() {
+		var labelValue = "";
+		$("#choosenclassify").find("span").each(function() {
+			labelValue = labelValue + $(this).attr("value") + ",";
+		});
+		$("#choosenclassifyvalue").val(labelValue);
+		$("#basic_validate").submit();
+	}
+
+	var shoptagcount = 1;
+	function shoptag(li) {
+		if (shoptagcount > 1) {
+			alert("只能选择一个分类");
+			return;
+		}
+
+		shoptagcount = shoptagcount + 1;
+		$("#delchoosenclassify")
+				//已选分类 
+				.append(
+						"<span  value="
+								+ $(li).attr("value")
+								+ ">"
+								+ $(li).text()
+								+ "</span><a onclick='delchoosenclassify(this)'>[X]&nbsp;&nbsp;</a>");
+	}
+	function delchoosenclassify(li) {
+		shoptagcount = shoptagcount - 1;
+		$(li).prev().remove();
+		$(li).remove();
+	}
+
+	function chooseArea(radio) {//多选框 checked 
+		var secondAreaId = $(radio).val();
+		if (secondAreaId == -1) {
+			$("#thirdAreaId").find("input[type=checkbox]").each(function() {
+				$(this).attr("checked", true);
+			});
+		} else {
+			$("#thirdAreaId").find("input[type=checkbox]").each(function() {
+				if ($(this).attr("parentId") == secondAreaId) {
+					$(this).attr("checked", true);
+				} else {
+					$(this).attr("checked", false);
+				}
+			});
+		}
+	}
+	// 服务范围  单选框 2级  
+	function scopeofservices(opt) {
+		var areaId = $(opt).find("option:selected").val();
+		if (areaId == -1) {
+			$('#secondAreaId').html("");
+			$('#thirdAreaId').html("");
+			return;
+		} else {
+			$.ajax({
+						type : "post",
+						url : '${ctx}/area!findSecondArea.action',
+						dataType : 'json',
+						data : {
+							areaId : areaId
+						},
+						timeout : 10000,
+						success : function(msg, status) {
+							if (msg.status == 200) {
+								var array = [];
+								array
+										.push('<td><label><input type="radio"	name="secondArea" checked   onclick="chooseArea(this)" ');
+								array.push('	 value=-1 />' + "开发区全部区域"
+										+ '</label></td>');
+								for ( var i = 0; i < msg.rows.length; i++) {
+									array
+											.push('<td><label><input  type="radio" name="secondArea" onclick="chooseArea(this)" ');
+									array.push('	 value="'
+											+ msg.rows[i]["areaId"] + '" />'
+											+ msg.rows[i]["areaName"]
+											+ '</label></td>');
+								}
+								$('#secondAreaId').html(array.join(''));
+
+								//园区名称  多选框排列   
+								var thirdAreaArray = [];
+								var rowTr = 3;
+								var columnTd = 1;
+								for ( var i = 0; i < msg.total.length; i++) {
+									//	alert(msg.total[i]["areaId"]);
+									rowTr = rowTr + 1;
+									if (rowTr % 4 == 0) {
+										columnTd = 1;
+										thirdAreaArray
+												.push('<tr><td><input type="checkbox"  style="font-size: 15px" checked class="tdstyle"');
+										thirdAreaArray.push('	 parentId="'
+												+ msg.total[i]["parentId"]
+												+ '"');
+										thirdAreaArray.push('	 value="'
+												+ msg.total[i]["areaId"] + '">'
+												+ msg.total[i]["areaName"]
+												+ '</td>');
+									} else {
+										columnTd = columnTd + 1;
+										if (columnTd == 4) {
+											thirdAreaArray
+													.push('<td><input type="checkbox"  style="font-size: 15px" checked class="tdstyle"');
+											thirdAreaArray.push('	 parentId="'
+													+ msg.total[i]["parentId"]
+													+ '"');
+											thirdAreaArray.push('	 value="'
+													+ msg.total[i]["areaId"]
+													+ '">'
+													+ msg.total[i]["areaName"]
+													+ '</td></tr>');
+										} else {
+											thirdAreaArray
+													.push('<td><input type="checkbox"  style="font-size: 15px" checked class="tdstyle"');
+											thirdAreaArray.push('	 parentId="'
+													+ msg.total[i]["parentId"]
+													+ '"');
+											thirdAreaArray.push('	 value="'
+													+ msg.total[i]["areaId"]
+													+ '">'
+													+ msg.total[i]["areaName"]
+													+ '</td>');
+										}
+									}
+								}
+								$('#thirdAreaId').html(thirdAreaArray.join('')); //园区名称  
+							} else
+								alert(msg.msg);
+						}
+					})
+		}
+	}
+
+	//地址输入框
+	function addressStreet(opt) {
+		var detailedAddress = $(opt).find("option:selected").val();
+		if (detailedAddress == -1) {
+			$('#address').val("");
+
+		} else {
+			var address = $("#detailedAddress").data(
+					"'" + detailedAddress + "'");
+			//	alert(address);
+			var str = new Array();
+			str = address.split("#");
+			//	alert(str);
+			$("#address").val(str[0]);
+			$("#lat").val(str[1]);
+			$("#lng").val(str[2]);
+			if ($("#lat").val(str[1])) {
+				$("#lat_check").html("");
+			}
+			if ($("#lng").val(str[1])) {
+				$("#lng_check").html("");
+			}
+		}
+	}
+ 
+	var reg = new RegExp("^[0-9--]*$");
+	var reg1 = new RegExp("[\u4e00-\u9fa5]"); //中文 字母
+	var reg2 = new RegExp("[A-Za-z0-9\u0391-\uffe5]"); // 中文 字母 数字 
+	var reg4 = new RegExp("^[1-9]d*.d*|0.d*[1-9]d*$");//正浮点数 
+ 
+	//店铺名称 
+	function nameOnBlur() {
+		var name = $.trim($("#name").val());
+		if (name == "") {
+			$("#name_check").html("不能为空！");
+		} else if ($.trim($("#name").val()).length > 20) {
+			$("#name_check").html("长度不能超过20个字符!");
+		} else {
+			$("#name_check").html("");
+			var badChar = "`~!@#$%^&()-_=+]\\\\|:;\"\\\'<,>?*/";
+			for ( var i = 0; i < name.length; i++) {
+				//字符串str中的字符
+				var c = name.charAt(i);
+				if (badChar.indexOf(c) > -1) {
+					$("#name_check").html("只能为汉字，字母，和数字！");
+				}
+			}
+		}
+	}
+	//联系人 
+	function linkmanOnBlur() {
+		var linkman = $.trim($("#linkman").val());
+		if (linkman == "") {
+			$("#linkman_check").html("不能为空！");
+		} else if ($.trim($("#linkman").val().length) > 20) {
+			$("#linkman_check").html("长度不能超过20个字符!");
+		} else if (!reg2.test(linkman)) {
+			$("#linkman_check").html("只能为汉字，字母！ ");
+		} else {
+			$("#linkman_check").html("");
+			var badChar = "`~!@#$%^&()-_=+]\\\\|:;\"\\\'<,>?*/0123456789";
+			for ( var i = 0; i < linkman.length; i++) {
+				//字符串str中的字符
+				var c = linkman.charAt(i);
+				if (badChar.indexOf(c) > -1) {
+					$("#linkman_check").html("只能为汉字，字母！");
+				}
+			}
+		}
+	}
+	//人均消费
+	function consumptionPerOnBlur() {
+		var consumptionPer = $.trim($("#consumptionPer").val());
+		if (!reg.test(consumptionPer)) {
+			$("#consumptionPer_check").html("只能为数字!");
+		} else if ($.trim($("#consumptionPer").val().length) > 9) {
+			$("#consumptionPer_check").html("长度不能超过9个字符!");
+		} else {
+			$("#consumptionPer_check").html("");
+		}
+	}
+
+	//起送费
+	function sendpriceOnBlur() {
+		var sendPrice = $.trim($("#sendPrice").val());
+		if (!reg.test(sendPrice)) {
+			$("#sendPrice_check").html("只能为数字!");
+		} else if ($.trim($("#sendPrice").val().length) > 9) {
+			$("#sendPrice_check").html("长度不能超过9个字符!");
+		} else {
+			$("#sendPrice_check").html("");
+		}
+	}
+
+	//外送费
+	function deliverMoneyOnBlur() {
+		var deliverMoney = $.trim($("#deliverMoney").val());
+		if (!reg.test(deliverMoney)) {
+			$("#deliverMoney_check").html("只能为数字!");
+		} else if ($.trim($("#deliverMoney").val().length) > 9) {
+			$("#deliverMoney_check").html("长度不能超过9个字符!");
+		} else {
+			$("#deliverMoney_check").html("");
+		}
+	}
+	//联系人电话 
+	function linkmanTelOnBlur() {
+		var linkmanTel = $.trim($("#linkmanTel").val());
+		if (linkmanTel == "") {
+			$("#linkmanTel_check").html("不能为空！");
+		} else if (!reg.test(linkmanTel)) {
+			$("#linkmanTel_check").html("只能为数字!");
+		} else if ($.trim($("#linkmanTel").val().length) > 15) {
+			$("#linkmanTel_check").html("长度不能超过15个字符!");
+		} else {
+			$("#linkmanTel_check").html("");
+		}
+	}
+
+	//店铺内容
+	function contentOnBlur() {
+		var content11 = $.trim($("#content11").val());
+		if ($.trim($("#content11").val().length) > 500) {
+			$("#content_check").html("不能超过500个字符！");
+		} else {
+			$("#content_check").html("");
+		}
+	}
+
+	//纬度
+	function latOnBlur() {
+		var lat = $.trim($("#lat").val());
+		if (lat == "") {
+			$("#lat_check").html("不能为空！");
+		} else if (!reg4.test(lat)) {
+			$("#lat_check").html("请输入正确的纬度，如：123");
+		} else if ($.trim($("#lat").val().length) > 26) {
+			$("#lat_check").html("长度不能超过26个字符!");
+		} else {
+			$("#lat_check").html("");
+		}
+	}
+
+	//经度 
+	function lngOnBlur() {
+		var lng = $.trim($("#lng").val());
+		if (lng == "") {
+			$("#lng_check").html("不能为空！");
+		} else if (!reg4.test(lng)) {
+			$("#lng_check").html("请输入正确的经度，如：123");
+		} else if ($.trim($("#lng").val().length) > 26) {
+			$("#lng_check").html("长度不能超过26个字符!");
+		} else {
+			$("#lng_check").html("");
+		}
+	}
+	//营业时间 
+	function workTimeOnBlur() {
+		var workTime = $.trim($("#workTime").val());
+		if ($.trim($("#workTime").val().length) > 50) {
+			$("#workTime_check").html("长度不能超过50个字符!");
+		} else if (workTime == "") {
+			$("#workTime_check").html("");
+		} else if (!reg2.test(workTime)) {
+			$("#workTime_check").html("只能输入汉字,字母和数字!");
+		} else {
+			$("#workTime_check").html("");
+			var badChar = "`~!@#$%^()_=+]\，\,\\|;\"\\\'<,>?*,，,，。.;/";
+			for ( var i = 0; i < workTime.length; i++) {
+				//字符串str中的字符
+				var c = workTime.charAt(i);
+				if (badChar.indexOf(c) > -1) {
+					$("#workTime_check").html(
+							"可以使用&进行分隔，如：上午08:00-12:00&下午14:00-20:00");
+				}
+			}
+		}
+	}
+
+	//服务时间 
+	function serviceTimeOnBlur() {
+		var serviceTime = $.trim($("#serviceTime").val());
+		if ($.trim($("#serviceTime").val().length) > 50) {
+			$("#serviceTime_check1").html("长度不能超过50个字符!");
+		} else if (serviceTime == "") {
+			$("#serviceTime_check1").html("");
+		} else if (!reg2.test(serviceTime)) {
+			$("#serviceTime_check1").html("只能输入汉字,字母和数字!");
+		} else {
+			$("#serviceTime_check1").html("");
+			var badChar = "`~!@#$%^()_=+]\，\,\\|;\"\\\'<,>?*,，,，。.;/";
+			for ( var i = 0; i < serviceTime.length; i++) {
+				//字符串str中的字符
+				var c = serviceTime.charAt(i);
+				if (badChar.indexOf(c) > -1) {
+					$("#serviceTime_check1").html(
+							"可以使用&进行分隔，如：上午08:00-12:00&下午14:00-20:00");
+				}
+			}
+		}
+	}
+	//服务时间增加
+	//var serviceTimeFlag = true;
+	function addServiceTimeIdOnBlur(opt) {
+		var addserviceTime = $.trim($(opt).val());
+
+		if (addserviceTime.length > 50) {
+			$(opt).parent("div.input-append").next().find(
+					"font[name=addserviceTime_check]").html("长度不能超过50个字符!");
+		} else if (addserviceTime == "") {
+			$(opt).parent("div.input-append").next().find(
+					"font[name=addserviceTime_check]").html("");
+		} else {
+			$(opt).parent("div.input-append").next().find(
+					"font[name=addserviceTime_check]").html("");
+			var badChar = "`~!@#$%^()_=+]\，\,\\|;\"\\\'<,>?*,，,，。.;/";
+			for ( var i = 0; i < addserviceTime.length; i++) {
+				//字符串str中的字符
+				var c = addserviceTime.charAt(i);
+				if (badChar.indexOf(c) > -1) {
+					//alert($(opt).parent("div.input-append").next().find("font[name=addserviceTime_check]").html());
+					$(opt).parent("div.input-append").next().find(
+							"font[name=addserviceTime_check]").html(
+							"可以使用&进行分隔，如：上午08:00-12:00&下午14:00-20:00");
+					break;
+				}
+			}
+		}
+	}
+	
+//保存表单 
+	function saveShop() {
+		flag = true;
+		$("font[name=serviceTime_check]").each(function() {
+			if ($.trim($(this).html()) != "") {
+				flag = false;
+			}
+		});
+		//店铺编号
+	/* 	var shopNumber = $.trim($("#shopNumber").val());
+		if (shopNumber == "") {
+			$("#shopNumber_check").html("不能为空！");
+			flag = false;
+		} else if (!reg.test(shopNumber)) {
+			$("#shopNumber_check").html("只能为数字!");
+			flag = false;
+		} */
+		//店铺名称 
+		var name = $.trim($("#name").val());
+		if (name == "") {
+			$("#name_check").html("不能为空！");
+			flag = false;
+		} else if (!reg2.test(name)) {
+			$("#shopNumber_check").html("只能为汉字，字母，和数字！");
+			flag = false;
+		}
+		//联系人 
+		var linkman = $.trim($("#linkman").val());
+		if (linkman == "") {
+			$("#linkman_check").html("不能为空！");
+			flag = false;
+		} else if (!reg2.test(linkman)) {
+			$("#linkman_check").html("只能为汉字，字母！");
+			flag = false;
+		}
+
+		//联系人电话
+		var linkmanTel = $.trim($("#linkmanTel").val());
+		if (linkmanTel == "") {
+			$("#linkmanTel_check").html("不能为空！");
+			flag = false;
+		} else if (!reg.test(linkmanTel)) {
+			$("#linkmanTel_check").html("只能为数字!");
+			flag = false;
+		}
+		//纬度 
+		var lat = $.trim($("#lat").val());
+		if (lat == "") {
+			$("#lat_check").html("不能为空！");
+			flag = false;
+		} else if (!reg4.test(lat)) {
+			$("#lat_check").html("只能为数字!");
+			flag = false;
+		}
+		//经度 
+		var lng = $.trim($("#lng").val());
+		if (lng == "") {
+			$("#lng_check").html("不能为空！");
+			flag = false;
+		} else if (!reg4.test(lng)) {
+			$("#lng_check").html("只能为数字!");
+			flag = false;
+		}
+		//人均消费
+		var consumptionPer = $.trim($("#consumptionPer").val());
+		if (consumptionPer == "") {
+			$("#consumptionPer_check").html("不能为空！");
+		} else if (!reg.test(consumptionPer)) {
+			$("#consumptionPer_check").html("只能为数字!");
+		} else if ($.trim($("#consumptionPer").val().length) > 9) {
+			$("#consumptionPer_check").html("长度不能超过9个字符!");
+		} else {
+			$("#consumptionPer_check").html("");
+		}
+		//服务时间增加
+		function addServiceTimeIdOnBlur(opt) {
+			var addserviceTime = $.trim($(opt).val());
+			if (addserviceTime.length > 50) {
+				$(opt).parent("div.input-append").next().find(
+						"font[name=addserviceTime_check]").html("长度不能超过50个字符!");
+			} else if (addserviceTime == "") {
+				$(opt).parent("div.input-append").next().find(
+						"font[name=addserviceTime_check]").html("");
+			} else {
+				$(opt).parent("div.input-append").next().find(
+						"font[name=addserviceTime_check]").html("");
+				var badChar = "`~!@#$%^()_=+]\，\,\\|;\"\\\'<,>?*,，,，。.;/";
+				for ( var i = 0; i < addserviceTime.length; i++) {
+					//字符串str中的字符
+					var c = addserviceTime.charAt(i);
+					if (badChar.indexOf(c) > -1) {
+						//alert($(opt).parent("div.input-append").next().find("font[name=addserviceTime_check]").html());
+						$(opt).parent("div.input-append").next().find(
+								"font[name=addserviceTime_check]").html(
+								"可以使用&进行分隔，如：上午08:00-12:00&下午14:00-20:00");
+						break;
+					}
+				}
+			}
+		}
+		//以上匹配后执行       
+		if (flag != false) {
+			//已选标签
+			var labelValue = "";
+			$("#choosenLabel").find("span").each(function() {
+				labelValue = labelValue + $(this).attr("value") + ",";
+			});
+			$("#thirdCategoryTag").val(labelValue);
+			//已选分类
+			var label = "";
+			$("#delchoosenclassify").find("span").each(function() {
+				label = label + $(this).attr("value");
+			});
+			$("#categoryId").val(label);
+			//园区名称 
+			var serviceArea = "";
+			$("#thirdAreaId").find("input[type=checkbox]:checked").each(
+					function() {
+						serviceArea = serviceArea + $(this).val() + ",";
+					});
+			$("#thirdServiceArea").val(serviceArea);
+			var labelValue = "";
+			$("#choosenLabel").find("span").each(function() {
+				labelValue = labelValue + $(this).attr("value") + ",";
+			});
+			$("#thirdCategoryTag").val(labelValue);
+			$("#basic_validate").submit();//提交表单 
+		}
+	}
+	function addServiceTime() {
+		if ($("#addServiceTimeId").find('.controls').length > 2) {
+			alert("最多可以加3个时间框！");
+			return;
+		}
+		$("#addServiceTimeId")
+				.append(
+						"<div class='controls'><div class='input-append'><input type='text' class='span11'style='width: 262px;'  name='serviceTime' onblur='addServiceTimeIdOnBlur(this)'  id='addserviceTime'> </div><span><font color='red'  name='addserviceTime_check'> </font></span></div>");
+	}
+	function delServiceTime() {
+		$("#addServiceTimeId").find("div[class=controls]:last").remove();
+	}
+	//点击外送否 禁用相关输入框
+	function disabledOutSend(){
+		var flagOk = $("#deliverOk").is(":checked");
+		var flagNo = $("#deliverNo").is(":checked");
+		   if(flagNo==true){
+			   $("#consumptionPer").attr("disabled",true);
+			   $("#sendPrice").attr("disabled",true);
+			   $("#deliverMoney").attr("disabled",true); 
+			   document.getElementById("distributionArea").disabled=true;
+			   document.getElementById("sendTime").disabled=true;
+		   }else if(flagOk == true){
+			   $("#consumptionPer").removeAttr("disabled");
+			   $("#sendPrice").removeAttr("disabled");
+			   $("#deliverMoney").removeAttr("disabled");
+			   $("#sendTime").removeAttr("disabled");
+			   $("#thirdServiceArea").removeAttr("disabled");
+		   }
+	}
+</script>

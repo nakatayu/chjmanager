@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ServiceArea">
+	<typeAlias alias="ServiceArea" type="com.chj.entity.ServiceArea" />
+	<resultMap class="ServiceArea" id="ServiceAreaRes">
+		<result property="serviceId" column="service_id"/>
+		<result property="areaId" column="area_id"/>
+		<result property="deleteFlag" column="delete_flag"/>
+	</resultMap>
+<!-- 删除已选标签 -->
+	<delete id="deleteServiceArea" parameterClass="java.util.HashMap">
+				delete from tb_service_area where service_id=#serviceId#
+ 	</delete>
+
+	<!-- 园区名称保存 -->
+	<insert id="insertServiceArea" parameterClass="ServiceArea">
+		INSERT INTO tb_service_area
+           (service_id,area_id ,delete_flag)
+     VALUES
+           ( #serviceId#,#areaId# ,1)
+	</insert>
+	
+		<!-- 查找服务范围，园区名称 和 更新服务范围，园区名称 -->
+	<select id="findServiceArea" parameterClass="Object" resultClass="java.util.HashMap">
+	 select area_name as areaName,a.area_id as areaId from tb_service_area t left join tb_area a on t.area_id=a.area_id
+ 			where service_id=#serviceId#
+ 	</select>
+</sqlMap>	

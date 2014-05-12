@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Circle">
+
+	<typeAlias alias="Circle" type="com.chj.entity.Circle" />
+	<resultMap class="Circle" id="CircleRes">
+
+		<result property="circleId" column="circle_id" />
+		<result property="name" column="name" />
+		<result property="summary" column="summary" />
+		<result property="userId" column="user_id" />
+		<result property="createTime" column="create_time" />
+		<result property="level" column="level" />
+		<result property="status" column="status" />
+		<result property="type" column="type" />
+		<result property="circleContent" column="circle_content" />
+		<result property="circleImage" column="circle_image" />
+		<result property="circleViews" column="circle_views" />
+		<result property="isCheck" column="is_check" />
+		<result property="companyId" column="company_id" />
+		<result property="examineResult" column="examine_result" />
+
+	</resultMap>
+
+	<!--圈子列表显示 -->
+	<select id="findCircleList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		circle_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_circle
+		t
+		where delete_flag!=2
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="userId">
+				(user_id= #userId#)
+			</isNotEmpty>
+			<!-- <isNotEmpty prepend="AND" property="delete_flag"> (delete_flag!=2) 
+				</isNotEmpty> -->
+		</dynamic>
+		order by circle_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!--圈子列表显示 -->
+	<select id="findCCircleList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		circle_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_circle
+		t
+		where delete_flag!= 2
+		<!-- <dynamic prepend="WHERE"> <isNotEmpty prepend="AND" property="delete_flag"> 
+			(delete_flag!= 2) or (delete_flag is null) </isNotEmpty> </dynamic> -->
+		order by circle_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<!-- 分页 -->
+	<select id="queryCircleCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_circle where user_id=#userId#
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="delete_flag">
+				(delete_flag!=2)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 分页 -->
+	<select id="queryCCircleCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_circle where delete_flag!=2
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 添加圈子 -->
+	<insert id="instCircle" parameterClass="Circle">
+		insert into
+		tb_circle(name,summary,circle_content,company_id,level,status,type,circle_views,circle_image,create_time,is_check)
+		values(#name#,#summary#,#circleContent#,#companyId#,#level#,#status#,#type#,#circleViews#,#circleImage#,#createTime#,#isCheck#)
+		<selectKey resultClass="Long" type="post">
+			select @@IDENTITY as
+			value
+		</selectKey>
+	</insert>
+
+
+	<!-- 刪除圈子 -->
+	<update id="deleteCircle" parameterClass="java.util.HashMap">
+		update tb_circle set
+		delete_flag=#delete_flag#
+		where circle_id=#circleId#
+	</update>
+	<!-- 操作圈子 -->
+	<update id="updateCricle" parameterClass="Circle">
+		update tb_circle set
+		status=#status#,
+		level=#level#
+		where circle_id=#circleId#
+	</update>
+	<!-- 修改圈子 -->
+	<update id="updateCir" parameterClass="Circle">
+
+		update tb_circle set
+		name=#name#,
+		summary=#summary#,
+		is_check=#isCheck#,
+		circle_image=#circleImage#,
+		circle_content=#circleContent#,
+		user_id=#userId#,
+		company_id=#companyId#
+		where circle_id=#circleId#
+	</update>
+	<!--查询圈子总人数 -->
+	<select id="findUserCount" parameterClass="Object" resultClass="Long">
+		select count(*) from tb_circle_user where circle_id=#circleId#
+	</select>
+	<!-- 查询圈子话题数 -->
+	<select id="findThemeCount" parameterClass="Object" resultClass="Long">
+		select count(*) from tb_topic where circle_id=#circleId#
+	</select>
+	<!-- 查询圈子名 -->
+	<select id="findTopicC" parameterClass="Object" resultClass="String">
+		select name from tb_circle where circle_id=#circleId#
+	</select>
+	<!-- 查询圈子Id -->
+	<select id="findCirceId" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select circle_id from tb_circle
+
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="userId">
+				(user_id= #userId#)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="delete_flag">
+				(delete_flag=
+				#delete_flag#)
+			</isNotEmpty>
+		</dynamic>
+
+	</select>
+	<!-- 查询圈子名称 -->
+	<select id="findCName" parameterClass="Object" resultClass="String">
+		select name from tb_circle where circle_id=#circleId#
+	</select>
+	<!-- 逻辑删除圈子标签 -->
+	<update id="updateCircleTag" parameterClass="java.util.HashMap">
+		update tb_circle_tag
+		set
+		delete_flag=#delete_flag#
+		where circle_id=#circleId#
+	</update>
+	<!-- 圈子驳回 -->
+	<update id="updateBoHuiCircle" parameterClass="Circle">
+		update tb_circle
+		set
+		examine_result=#examineResult#,
+		admin_message=#adminMessage#
+		where
+		circle_id=#circleId#
+	</update>
+
+	<select id="updateCle" parameterClass="Long" resultClass="java.util.HashMap">
+		select
+		* from tb_circle where circle_id=#circleId#
+	</select>
+	<!-- 添加圈子用户 -->
+	<insert id="saveCircleUser" parameterClass="java.util.HashMap">
+		insert into
+		tb_circle_user
+		(circle_id,user_id,create_time,status,delete_flag)
+		values(#circle_id#,#user_id#,#create_time#,#status#,#delete_flag#)
+
+	</insert>
+	<!-- 查询圈子用户 -->
+	<select id="findCircleUserList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		create_time
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_circle_user t
+		where delete_flag!=2
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="circleId">
+				t.circle_id= #circleId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="filedDname">
+				t.$filedDname$=#filedDValue#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by create_time desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<!-- 删除圈子用户 -->
+	<update id="delCircleUserInfo" parameterClass="java.util.HashMap">
+		update
+		tb_circle_user set delete_flag=#delete_flag#
+		where user_id= #userId#
+		and circle_id=#circleId#
+	</update>
+
+	<select id="findppCircleList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by examine_result desc,
+		create_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from
+		tb_circle t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="circleStatus">
+				t.examine_result=#circleStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.name like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.first_phone_extend>0 or t.relation_phone_extend>0 or
+					t.is_extend_index>0 or t.is_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+		order by examine_result desc, create_time desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<select id="findppCircleListCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_circle t where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="circleStatus">
+				t.examine_result=#circleStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.name like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.first_phone_extend>0 or t.relation_phone_extend>0 or
+					t.is_extend_index>0 or t.is_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+	</select>
+	<update id="updateCircleStatus" parameterClass="java.util.HashMap">
+		update tb_circle
+		set status=#status#,examine_result=3 where
+		circle_id=#circleId# and
+		company_id=#companyId#
+	</update>
+	<update id="updateCircleExamine" parameterClass="java.util.HashMap">
+		update tb_circle
+		set examine_result=#examine#
+		<isNotNull>
+			<isNotEmpty prepend="," property="level">
+				level=#level#
+			</isNotEmpty>
+		</isNotNull>
+		where circle_id=#circleId#
+	</update>
+	<!-- 赵 -->
+	<select id="findCircleDetail" parameterClass="Long" resultMap="CircleRes">
+		select * from tb_circle where circle_id=#value#
+	</select>
+	<select id="findCircleTagList" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select tag_id as tagId,tag_name as tagName from tb_tag t
+		where t.delete_flag!=2 and exists(select * from tb_circle_tag r where
+		r.delete_flag!=2 and r.tag_id=t.tag_id and r.circle_id=#value#)
+	</select>
+	<select id="findCircleUserCardImage" parameterClass="Long"
+		resultClass="String">
+		select card_path from tb_circle_cardimage where
+		circle_id=#value# and
+		delete_flag!=2
+	</select>
+	<update id="updateCircle" parameterClass="Circle">
+		update tb_circle set
+		name=#name#,level=#level#,circle_content=#circleContent#,
+		circle_image=#circleImage#,is_check=#isCheck#,
+		summary=#summary#,status='2',examine_result=3 where
+		circle_id=#circleId#
+	</update>
+	<update id="deleteCardImages" parameterClass="Long">
+		update
+		tb_circle_cardimage SET delete_flag=2 where circle_id=#value#
+	</update>
+	<delete id="deleteCircleTags" parameterClass="Long">
+		delete from
+		tb_circle_tag where circle_id=#value#
+	</delete>
+	<insert id="insertCircleCardImage" parameterClass="java.util.HashMap">
+		insert into
+		tb_circle_cardimage(circle_id,card_path,create_time)
+		values(#circleId#,#cardPath#,#createTime#)
+	</insert>
+	<!-- 赵 -->
+
+	<select id="findUserRoleCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_circle_user t where circle_id=#circleId#
+		<dynamic>
+			<isNotEmpty prepend="AND" property="filedDname">
+				#filedDname#=
+			</isNotEmpty>
+			<isNotEmpty prepend="" property="filedDValue">
+				#filedDValue#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<update id="updatetbUserDStatus" parameterClass="java.util.HashMap">
+		update
+		tb_circle_user set status=#status# where user_id=#userId# and
+		circle_id=#circleId#
+	</update>
+	<update id="updatetbUserDRoles" parameterClass="java.util.HashMap">
+		update
+		tb_circle_user set circle_role=#circleRole# where user_id=#userId#
+		and
+		circle_id=#circleId# and status='1'
+	</update>
+
+	<!-- 删除企业下圈子 -->
+	<update id="deleteCompanyCircle" parameterClass="java.util.HashMap">
+		UPDATE tb_topic
+		SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+
+	<select id="qryNumOfcirclefilme" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_circle where $filName$>0
+		and
+		delete_flag!=2 and examine_result!=2
+	</select>
+
+	<update id="updaCircleLstop" parameterClass="java.util.HashMap">
+		update tb_circle set
+		$filName$=#filValue# where circle_id=#circleId#
+	</update>
+
+	<select id="findCircleLevelList" resultClass="java.util.HashMap">
+		select
+		type,person_num as num,info from tb_circle_level order by type
+	</select>
+	<select id="selCirlelevelMaxId" resultClass="Integer">
+		select max(type)
+		from tb_circle_level
+	</select>
+
+	<insert id="addnewLevelCir" parameterClass="java.util.HashMap">
+		insert into
+		tb_circle_level(type,person_num,info)
+		values(#levelId#,#userNum#,#levelInfo#)
+	</insert>
+	<update id="updcirclelevel" parameterClass="java.util.HashMap">
+		update
+		tb_circle_level set person_num=#userNum#,info=#levelInfo# where
+		type=#levelId#
+	</update>
+	<select id="findCircleAddLevel" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top 1 * from tb_apply_info where
+		object_id=#objectId#
+		and type=#type# and do_type=#doType# order by
+		create_time desc
+	</select>
+
+	<insert id="reqCircleLevel" parameterClass="java.util.HashMap">
+		insert into tb_apply_info(object_id, type, do_type, file_path,
+		create_time, reason) values(#objectId#, #type#, #doType#, #filePath#,
+		#createTime#, #reason#)
+		<selectKey resultClass="Long" type="post">
+			select @@IDENTITY as
+			value
+		</selectKey>
+	</insert>
+
+</sqlMap>

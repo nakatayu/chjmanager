@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Area">
+	<typeAlias alias="Area" type="com.chj.entity.Area" />
+
+	<!-- 显示服务范围全部信息 -->
+	
+	<!-- 获取服务一级类别 -->
+	<select id="queryFirstArea" resultClass="java.util.HashMap">
+		select area_id as areaId,area_name as areaName from tb_area Where parent_id =0 and delete_flag=1
+	</select>
+
+	<!-- 获取服务范围 单选框 -->
+	<select id="querySecondArea" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select area_id as areaId,area_name as areaName,lat,lng from tb_area Where parent_id =#areaId# and delete_flag=1
+	</select>
+
+
+
+	<!-- 服务范围 多选框 -->
+	<select id="queryThirdArea" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		<!-- select area_id as areaId,area_name as areaName from tb_area t Where 
+			exists(select * from tb_area s where s.parent_id=#areaId# and s.area_id=t.parent_id) -->
+		select area_id as areaId,area_name as areaName,(select a.area_id from
+		tb_area a where a.area_id=t.parent_id) as parentId from
+		tb_area t Where
+		exists(select * from tb_area s where s.parent_id=1 and
+		s.area_id=t.parent_id)
+	</select>
+
+	<!-- 地址 下拉框 -->
+	<select id="queryDetailedAddress" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		<!-- select area_id as areaId,area_name as areaName,detailed_address as 
+			detailedAddress from tb_area Where detailed_address is not null -->
+		select area_id as areaId,area_name as
+		areaName,detailed_address as
+		detailedAddress,lat,lng from tb_area Where detailed_address is not
+		null
+	</select>
+	<!-- 店铺服务范围 -->
+	<select id="findShopThirdArea" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select t.area_id as areaId,t.area_name as areaName,(select a.area_id from
+		tb_area a where a.area_id=t.parent_id) as
+		parentId,csa.company_shop_area_id as nums from
+		tb_area t left join
+		tb_company_shop_area csa on t.area_id=csa.area_id and
+		csa.company_shop_id=#shopId# Where
+		exists(select * from tb_area s where s.parent_id=#areaId# and
+		s.area_id=t.parent_id)
+	</select>
+	<!-- 查询位置管理 -->
+	<select id="findLocationManageList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		area_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_area
+		t
+		where delete_flag!=2 and parent_id=0
+		order by area_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<!-- 查询位置管理分页  -->
+	<select id="findLocationManageCount" parameterClass="java.util.HashMap" resultClass="Long">
+	select count(*) from tb_area where delete_flag!=2 and parent_id=0
+	</select>
+	<!-- 删除位置管理 -->
+	<update id="delLocationmanage" parameterClass="String">
+	update tb_area set  delete_flag =2 where area_id=#areaId#
+	</update>
+		<!-- 查询位置管理子集 -->
+	<select id="findLocationManageSubsetList" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		area_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_area
+		t
+		where delete_flag!=2 and  parent_id=#parentId#
+		order by area_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+		<!-- 查询位置管理分页 子集-->
+	<select id="findLocationManageSubsetListCount" parameterClass="java.util.HashMap" resultClass="Long">
+		select count(*) from tb_area where delete_flag!=2 and parent_id=#parentId#
+	</select>
+	<!-- 添加位置 -->
+	<insert id="addLocationManageList" parameterClass="Area">
+	INSERT INTO tb_area
+	(area_name,detailed_address,parent_id,lat,lng,delete_flag)
+	VALUES(#areaName#,#detailedAddress#,#parentId#,#lat#,#lng#,#deleteFlag#)
+	<selectKey keyProperty="areaId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	 
+	<!--显示一级位置详情  -->
+	<select id="LocationManageList" parameterClass="String" resultClass="java.util.HashMap">
+	    select * from tb_area where area_id =#areaid#
+	</select>
+	
+	<!-- 修改位置 -->
+	<update id="updateLoactionManageInfo" parameterClass="Area" >
+	update tb_area set 
+	area_name=#areaName#,
+	detailed_address=#detailedAddress#,
+	lat=#lat#,
+	lng=#lng#
+	where area_id = #areaId#
+	</update>
+	
+	<!-- 新增父节点位置 -->
+	<insert id="PLocationManageList">
+	INSERT INTO tb_area
+	(area_name,delete_flag,parent_id)
+	VALUES(#areaName#,#deleteFlag#,#parentId#)
+	<selectKey keyProperty="areaId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	<!-- 查询位置名称 -->
+	<select id="addLocationManage" parameterClass="String" resultClass="String">
+	select area_name from tb_area where area_id = #areaId#
+	</select>
+	<!-- 查找父节点信息 -->
+	<select id="findLoactionManageInfo" parameterClass="String" resultClass="java.util.HashMap">
+	select * from tb_area where area_id = #areaId#
+	</select>
+ 
+ <!--企业后台   店铺新增页面里面的配送范围-->
+ <select id="findShopStairDistributionArea"  resultClass="java.util.HashMap">	
+ 	select area_id as areaId,area_name as areaName,parent_id as parentId,delete_flag from tb_area where parent_id = 0 and delete_flag!=2
+ </select>
+ <!--企业后台   店铺新增页面里面的配送范围-->
+ <select id="findShopSecondLevelDistributionArea"  resultClass="java.util.HashMap">	
+ 	select area_id as areaId,area_name as areaName from tb_area Where parent_id=#areaId# and delete_flag!=2
+ </select>
+ 
+</sqlMap>
+
+

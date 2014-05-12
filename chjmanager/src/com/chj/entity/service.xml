@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Service">
+	<typeAlias alias="Service" type="com.chj.entity.Service" />
+	<resultMap class="Service" id="ServiceRes">
+		<result property="serviceId" column="service_id" />
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="seeCount" column="see_count"/>
+		<result property="star" column="star"/>
+		<result property="lon" column="lon"/>
+		<result property="lat" column="lat"/>
+		<result property="userId" column="user_id"/>
+		<result property="type" column="type"/>
+		<result property="companyId" column="company_id"/>
+	
+	</resultMap>
+	
+	<select id="findserInfo" parameterClass="java.util.HashMap"
+		resultMap="ServiceRes">
+		select top $size$ * from (select row_number()over(order by
+		service_id)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_service t
+		
+		order by service_id) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	
+</sqlMap>

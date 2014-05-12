@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Productshopcategory">
+	<typeAlias alias="Productshopcategory" type="com.chj.entity.Productshopcategory" />
+	<resultMap class="Productshopcategory" id="ProductshopcategoryRes">
+		<result property="productShopCategoryId" column="product_shop_category_id" />
+		<result property="name" column="name" />
+		<result property="parentId" column="parent_id" />
+		<result property="shopId" column="shop_id" />
+		<result property="creationTime" column="creation_time" />
+	</resultMap>
+
+	<update id="updateCompanyShopProductStock" parameterClass="java.util.HashMap">
+		update tb_company_shop_product_sku set stock =#stock#,
+		stock_day=#stockDay# where
+		company_shop_product_id=#companyShopProductId#
+	</update>
+
+	<!-- 商品分类列表显示 -->
+	<select id="findProductShopCategoryList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select pc.* ,sp.num from tb_product_shop_category pc
+		left join
+		(select product_shop_category_id,
+		COUNT(company_shop_product_id) num
+		from tb_company_shop_product p where
+		p.company_shop_id=#shopId# and
+		p.delete_flag!=2
+		and exists(select * from
+		tb_company_shop_product_sku u
+		where
+		u.company_shop_product_id=p.company_shop_product_id and
+		u.delete_flag!=2)
+		and exists(select * from
+		tb_product tp
+		where
+		tp.product_id=p.product_id and
+		tp.delete_flag!=2)
+		group by
+		product_shop_category_id) sp
+		on
+		pc.product_shop_category_id=sp.product_shop_category_id
+		where
+		shop_id=#shopId# and delete_flag!=2
+	</select>
+
+	<!-- 商品数量计算 -->
+	<select id="findCount" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select COUNT(*) counts from tb_company_shop_product
+		where
+		product_shop_category_id=#categoryId#
+	</select>
+
+	<!-- 商品分类分页 -->
+	<select id="queryProductShopCategoryPageCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_product_shop_category
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="shopId">
+				shop_id= #shopId# and
+				delete_flag = 1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 删除分类 -->
+	<!-- <delete id="deleteProductShopCategory" parameterClass="java.util.HashMap"> 
+		delete from tb_product_shop_category where product_shop_category_id=#shopId# 
+		</delete> -->
+	<update id="deleteProductShopCategory" parameterClass="java.util.HashMap">
+		update
+		tb_product_shop_category set delete_flag=2 where
+		product_shop_category_id=#categoryId#
+	</update>
+
+	<!-- 增加分类 -->
+	<insert id="insertProductShopCategory" parameterClass="Productshopcategory">
+		INSERT INTO tb_product_shop_category (
+		<isNotEmpty property="name">
+			name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shopId">
+			shop_id
+		</isNotEmpty>
+		,creation_time
+		) VALUES(
+		<isNotEmpty property="name">
+			#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shopId">
+			#shopId#
+		</isNotEmpty>
+		,getdate()
+		)
+		<selectKey keyProperty="productShopCategoryId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!-- 更新分类信息 -->
+	<update id="updateCategory" parameterClass="java.util.HashMap">
+		update
+		tb_product_shop_category set
+		name=#name#, order_field=#orderField#
+		where product_shop_category_id=#categoryId# and shop_id=#shopId#
+	</update>
+
+
+	<!--开发区后台 企业类型 -->
+	<select id="findCompanyType" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select name from tb_company_shop_category where type =
+		1 and delete_flag=1
+	</select>
+
+	<!--开发区后台 店铺类型 -->
+	<select id="findShopType" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select company_shop_category_id,name,type,delete_flag
+		from
+		tb_company_shop_category where type = 2 and delete_flag!=2
+	</select>
+
+	<insert id="insertpsCategory" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_shop_category (
+		creation_time, name, shop_id,
+		order_field, delete_flag) VALUES(
+		getdate(), #name#,
+		#shopId#,
+		#orderField#, 1)
+		<selectKey keyProperty="productShopCategoryId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+</sqlMap>	

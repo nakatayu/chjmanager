@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Topic">
+	<typeAlias alias="Topic" type="com.chj.entity.Topic" />
+
+	<!--话题列表显示 -->
+	<select id="findTopicList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		topic_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_topic
+		t
+		WHERE user_id= #userId# and delete_flag!=2
+		order by topic_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!-- 企业话题列表显示 -->
+	<select id="findCTopicList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		topic_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_topic
+		t
+		WHERE delete_flag!= 2
+		<!-- <dynamic prepend="WHERE"> <isNotEmpty prepend="AND" property="delete_flag">(delete_flag= 
+			#delete_flag#)</isNotEmpty> </dynamic> -->
+		order by topic_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!-- 分页 -->
+	<select id="queryTopicCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_topic where user_id=#userId# and
+		delete_flag!=2
+	</select>
+
+	<!-- 企业分页 -->
+	<select id="queryCTopicCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_topic where delete_flag!= 2
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<!-- 添加话题 -->
+	<insert id="instTopic" parameterClass="Topic">
+		insert into
+		tb_topic(topic_name,topic_content,company_id,status,topic_views,create_time,summary,classics
+		<isNotEmpty property="examineResult">
+			,examine_result
+		</isNotEmpty>
+		<isNotEmpty property="circleId">
+			,circle_id
+		</isNotEmpty>
+		<isNotEmpty property="activityId">
+			,activity_id
+		</isNotEmpty>
+		)
+		values(#topicName#,#topicContent#,#companyId#,#status#,#topicViews#,#createTime#,#summary#,#classics#
+		<isNotEmpty property="examineResult">
+			,#examineResult#
+		</isNotEmpty>
+		<isNotEmpty property="circleId">
+			,#circleId#
+		</isNotEmpty>
+		<isNotEmpty property="activityId">
+			,#activityId#
+		</isNotEmpty>
+		)
+		<selectKey resultClass="Long" type="post">
+			select @@IDENTITY as
+			value
+		</selectKey>
+	</insert>
+
+	<!-- 逻辑刪除话题 -->
+	<update id="deleteTopic" parameterClass="java.util.HashMap">
+		update tb_topic set
+		delete_flag=#delete_flag#
+		where topic_id=#topicId#
+	</update>
+	<!-- 修改话题 -->
+	<update id="updateCirleInfo" parameterClass="Topic">
+		update tb_topic set
+		topic_name=#topicName#,
+		summary=#summary#,
+		topic_content=#topicContent#
+		where topic_id=#topicId#
+	</update>
+	<!-- 话题浏览数 -->
+	<select id="findTopicCp" parameterClass="Object" resultClass="Long">
+		select count(*) from tb_topic_comment where topic_id=#topicId# and
+		delete_flag!=2
+	</select>
+	<delete id="delTopicTag" parameterClass="Long">
+		delete from tb_topic_tag
+		where topic_id=#topicId#
+	</delete>
+	<insert id="saveTopic" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_topic_tag(topic_id,tag_id,create_time,delete_flag)
+		VALUES(#topic_id#,#tag_id#,#create_time#,#delete_flag#)
+	</insert>
+	<!-- 修改话题 -->
+	<update id="updateTstatus" parameterClass="Topic">
+		update tb_topic set
+		status=#status#
+		where topic_id=#topicId#
+	</update>
+	<!-- 保存图片 -->
+	<insert id="seveTopicImge" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_topic_image(topic_id,file_path,create_time,delete_flag)
+		VALUES(#topic_id#,#file_path#,#create_time#,#delete_flag#)
+	</insert>
+	<!-- 删除图片 -->
+	<delete id="delTopicImge" parameterClass="Long">
+		delete from
+		tb_topic_image
+		where topic_id=#topicId#
+	</delete>
+	<!-- 逻辑删除话题标签 -->
+	<update id="updateTopicTag" parameterClass="java.util.HashMap">
+		update tb_topic_tag
+		set
+		delete_flag=#delete_flag#
+		where topic_id=#topicId#
+	</update>
+	<!-- 逻辑删除话题图片 -->
+	<update id="updateTopicImge" parameterClass="java.util.HashMap">
+		update
+		tb_topic_image set
+		delete_flag=#delete_flag#
+		where topic_id=#topicId#
+	</update>
+	<!-- 捕获操作 -->
+	<update id="updateNoTopInfo" parameterClass="Topic">
+		update tb_topic set
+		examine_result=#examineResult#,
+		admin_message=#adminMessage#
+		where
+		topic_id=#topicId#
+	</update>
+	<!-- 修改话题 -->
+	<select id="updateTop" parameterClass="String" resultClass="java.util.HashMap">
+		select * from tb_topic where topic_id=#topicId#
+	</select>
+	<!-- 查询标签名称和Id -->
+	<select id="updateTopListTag" parameterClass="String"
+		resultClass="java.util.HashMap">
+		select a.tag_id,tag_name from tb_topic_tag t left join
+		tb_tag a on
+		t.tag_id=a.tag_id where topic_id=#topicId#
+	</select>
+	<!-- 查询话题列表 -->
+	<select id="findZhengTopicList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select * from (select row_number()over(order by examine_result desc, create_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from tb_topic t
+		where delete_flag!=2 and t.status is not null
+		<dynamic prepend="">
+			<isGreaterThan compareValue="0" prepend="AND" property="circleId">
+				t.circle_id=#circleId#
+			</isGreaterThan>
+			<isEqual compareValue="0" prepend="AND" property="circleId">
+				(t.circle_id=null or t.circle_id is null)
+			</isEqual>
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="topicStatus">
+				t.examine_result=#topicStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.topic_name like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isEqual prepend="AND" compareValue="0" property="selfRole">
+				(t.classics=0 or t.classics is null)
+			</isEqual>
+			<isEqual prepend="AND" compareValue="1" property="selfRole">
+				t.classics>0
+			</isEqual>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.list_top>0 or t.first_phone_extend>0 or
+					t.relation_phone_extend>0 or t.web_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+		order by examine_result desc, create_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+	<select id="findZhengTopicListCount" resultClass="long"
+		parameterClass="java.util.HashMap">
+		select count(*) from tb_topic t where delete_flag!=2 and
+		t.status is not null
+		<dynamic prepend="">
+			<isGreaterThan compareValue="0" prepend="AND" property="circleId">
+				t.circle_id=#circleId#
+			</isGreaterThan>
+			<isEqual compareValue="0" prepend="AND" property="circleId">
+				(t.circle_id=null or t.circle_id is null)
+			</isEqual>
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="topicStatus">
+				t.examine_result=#topicStatus#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.topic_name like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isEqual prepend="AND" compareValue="0" property="selfRole">
+				(t.classics=0 or t.classics is null)
+			</isEqual>
+			<isEqual prepend="AND" compareValue="1" property="selfRole">
+				t.classics>0
+			</isEqual>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.list_top>0 or t.first_phone_extend>0 or
+					t.relation_phone_extend>0 or t.web_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+	</select>
+	<update id="updateTopicStatus" parameterClass="java.util.HashMap">
+		update tb_topic set examine_result=#status# where
+		examine_result>#status#
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="topicId">
+				topic_id=#topicId#
+			</isNotEmpty>
+		</dynamic>
+	</update>
+	<update id="updateTopicEXcetes" parameterClass="java.util.HashMap">
+		update tb_topic
+		set delete_flag=2 where topic_id=#topicId#
+	</update>
+
+	<update id="updateTopic" parameterClass="Topic">
+		update tb_topic set
+		topic_name=#topicName#,topic_content=#topicContent#,
+		summary=#summary#,status=#status#,examine_result=#examineResult# where
+		topic_id=#topicId#
+	</update>
+
+	<update id="deleteTopicImages" parameterClass="Long">
+		update
+		tb_topic_image SET delete_flag=2 where topic_id=#value#
+	</update>
+	<delete id="deleteTopicTags" parameterClass="Long">
+		delete from
+		tb_topic_tag where topic_id=#value#
+	</delete>
+	<select id="findTopicDetail" parameterClass="Long" resultClass="java.util.HashMap">
+		select * from tb_topic where topic_id=#topicId#
+	</select>
+	<select id="findTopicImageList" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select topic_img_id as topicImageId,file_path as filePath
+		from
+		tb_topic_image where topic_id=#value# and delete_flag!=2
+	</select>
+
+	<select id="selectTopicTagList" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select tag_id as tagId,tag_name as tagName from tb_tag s
+		where s.tag_id in(select t.tag_id from tb_topic_tag t
+		where
+		t.topic_id=#value#)
+	</select>
+	<select id="findTopicCommentList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by comment_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from
+		tb_topic_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="topicId">
+				t.topic_id=#topicId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by comment_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+
+	<select id="findTopicCistCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_topic_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="topicId">
+				t.topic_id=#topicId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="toUserId">
+				t.to_user_id=#toUserId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<update id="updatCommentDelete" parameterClass="java.util.HashMap">
+		update
+		tb_topic_comment set delete_flag=2 where topic_comment_id=#comId# and
+		topic_id=#topicId#
+	</update>
+	<!-- 删除企业下话题 -->
+	<update id="deleteCompanyTopic" parameterClass="java.util.HashMap">
+		UPDATE tb_topic
+		SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+
+	<update id="updaTopiclistTop" parameterClass="java.util.HashMap">
+		update tb_topic set
+		$filName$=#filValue# where topic_id=#topicId#
+	</update>
+
+	<select id="queryNumberOfStr" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_topic where $filName$>0 and
+		delete_flag!=2 and
+		examine_result!=2
+		<isEqual prepend="AND" compareValue="0" property="selfRole">
+			(classics=0
+			or classics is null)
+		</isEqual>
+		<isEqual prepend="AND" compareValue="1" property="selfRole">
+			classics>0
+		</isEqual>
+	</select>
+
+	<!-- 删除账号 -->
+	<update id="deleteTopic1" parameterClass="java.util.HashMap">
+		UPDATE tb_topic SET
+		delete_flag = 2 WHERE topic_id=#topicId#
+	</update>
+
+</sqlMap>

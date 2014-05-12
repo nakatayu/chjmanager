@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Company">
+	<typeAlias alias="Company" type="com.chj.entity.Company" />
+
+	<resultMap class="Company" id="CompanyRes">
+		<result property="companyId" column="company_id" />
+		<result property="name" column="name" />
+		<result property="address" column="address" />
+		<result property="email" column="email" />
+		<result property="registDate" column="regist_date" />
+		<result property="logo" column="logo" />
+		<result property="companyType" column="company_type" />
+		<result property="linkman" column="linkman" />
+		<result property="linkmanTel" column="linkman_tel" />
+		<result property="operateScope" column="operate_scope" />
+		<result property="companyInfo" column="company_info" />
+		<result property="companyURL" column="companyURL" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="orderField" column="order_field" />
+		<result property="starScore" column="star_score" />
+		<result property="examineResult" column="examine_result" />
+		<result property="deleteFlag" column="delete_flag" />
+	</resultMap>
+
+	<typeAlias alias="CompanyShopCategory" type="com.chj.entity.CompanyShopCategory" />
+	<resultMap class="CompanyShopCategory" id="CompanyShopCategoryRes">
+		<result property="companyShopCategoryId" column="company_shop_category_id" />
+		<result property="name" column="name" />
+		<result property="type" column="type" />
+		<result property="deleteFlag" column="delete_flag" />
+
+
+
+	</resultMap>
+	<select id="queryCompany" parameterClass="java.util.HashMap"
+		resultMap="CompanyRes">
+
+		select top $size$ * from tb_company where company_id>=(
+		select
+		max(company_id) from (
+		select top $startIndex$ company_id from
+		tb_company
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+		order by company_id
+		) as t
+		)
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+		order by company_id
+	</select>
+
+	<select id="queryCompanyCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_company where delete_flag=1
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+			<isNotNull prepend="" property="status">
+				<isNotEmpty prepend="AND" property="status">
+					examine_result=#status#
+				</isNotEmpty>
+			</isNotNull>
+			<isNotNull>
+				<isEqual compareValue="1" prepend="AND" property="top">
+					order_field>0
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<insert id="sevecp" parameterClass="Company">
+		INSERT INTO
+		tb_company(name,address,email,regist_date,company_type,linkman,linkman_tel,company_info,operate_scope,companyURL,delete_flag,logo)
+		VALUES(#name#,#address#,#email#,#registDate#,#companyType#,#linkman#,#linkmanTel#,#companyInfo#,#operateScope#,#companyURL#,#deleteFlag#,#logo#)
+		<selectKey keyProperty="areaId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	<delete id="delcpInfo" parameterClass="Long">
+		delete from tb_company
+		where company_id = #value#
+	</delete>
+	<update id="updateCompanyInfo" parameterClass="Company">
+		update tb_company
+		set
+		name=#name#,
+		address=#address#,
+		email=#email#,
+		company_type=#companyType#,
+		linkman=#linkman#,
+		linkman_tel=#linkmanTel#,
+		operate_scope=#operateScope#,
+		company_info=#companyInfo#,
+		companyURL=#companyURL#
+		where company_id =
+		#companyId#
+	</update>
+
+	<!--查找店铺所属的企业ID -->
+	<select id="findCompanyId" parameterClass="java.lang.Long"
+		resultClass="java.lang.Long">
+		select company_id as companyId from tb_company_shop cs
+		left join Personnel p on cs.company_shop_id=p.OrganizationalID where
+		cs.company_shop_id=#companyShopId#
+	</select>
+	<!--店铺权限 查看企业信息 -->
+	<select id="findShopCheckCompanyInfo" parameterClass="java.lang.Long"
+		resultClass="Company">
+		SELECT company_id as
+		companyId,name,address,email,regist_date as
+		registDate,logo,company_type as companyType,linkman,
+		linkman_tel as
+		linkmanTel,operate_scope,company_info as
+		companyInfo,companyURL,star_score,order_field
+		FROM tb_company where
+		company_id=#value#
+	</select>
+
+	<!--企业权限 查看企业信息 -->
+	<select id="findCompanyInfo" parameterClass="java.lang.Long"
+		resultClass="Company">
+		SELECT
+		name,address,email,regist_date as
+		registDate,logo,company_type as companyType,linkman,
+		linkman_tel as
+		linkmanTel,operate_scope as operateScope,company_info as
+		companyInfo,companyURL,
+		company_type as
+		companyType,status,type,examine_result as examineResult
+		FROM
+		tb_company
+		where company_id =#companyId#
+	</select>
+
+
+	<!-- 更新企业信息 -->
+	<update id="updateCompanyInfoSave" parameterClass="Company">
+		update tb_company set
+		<isNotEmpty property="name">
+			name = #name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			email =#email#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			address =#address#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="registDate">
+			regist_date =#registDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			logo =#logo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyType">
+			company_type=#companyType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			linkman_tel=#linkmanTel#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			linkman=#linkman#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyURL">
+			companyURL=#companyURL#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyInfo">
+			company_info=#companyInfo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="operateScope">
+			operate_scope=#operateScope#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="examineResult">
+			examine_result=#examineResult#
+		</isNotEmpty>
+		where company_id=#companyId#
+	</update>
+
+
+	<!--开发区权限 查看企业列表 -->
+	<select id="findCompanyList" parameterClass="java.util.HashMap"
+		resultMap="CompanyRes">
+		select top $size$ * from (select row_number()over(order by
+		company_id
+		desc)rowId,*
+		from (select top ($startIndex$+ $size$) * from
+		tb_company
+		where
+		delete_flag = 1
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+			<isNotNull property="status">
+				<isNotEmpty prepend="AND" property="status">
+					examine_result=#status#
+				</isNotEmpty>
+			</isNotNull>
+			<isNotNull>
+				<isEqual compareValue="1" prepend="AND" property="top">
+					order_field>0
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+		order by
+		company_id desc) ss
+		) sss
+		where sss.rowId>$startIndex$
+	</select>
+
+	<!--开发区权限 删除企业列表信息 -->
+	<update id="deleteCompanyListInfo" parameterClass="java.util.HashMap">
+		update
+		tb_company set delete_flag=2 where company_id =#companyId#
+	</update>
+	<!--开发区权限 创建企业列表信息 -->
+	<insert id="newCompany" parameterClass="Company">
+		INSERT INTO TB_COMPANY(
+
+		<isNotEmpty property="name">
+			name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="type">
+			type
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="operateScope">
+			operate_scope
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			email
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			linkman_tel
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			linkman
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			address
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyInfo">
+			company_info
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyURL">
+			companyURL
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="registDate">
+			regist_date
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyType">
+			company_type
+		</isNotEmpty>
+
+		<isNotEmpty prepend="," property="logo">
+			logo
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deleteFlag">
+			delete_flag
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			status
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="examineResult">
+			examine_result
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="starScore">
+			star_score
+		</isNotEmpty>
+		)
+		VALUES(
+
+		<isNotEmpty property="name">
+			#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="type">
+			#type#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="operateScope">
+			#operateScope#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			#email#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			#linkmanTel#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			#linkman#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			#address#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyInfo">
+			#companyInfo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyURL">
+			#companyURL#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="registDate">
+			#registDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyType">
+			#companyType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			#logo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deleteFlag">
+			#deleteFlag#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="examineResult">
+			#examineResult#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="starScore">
+			#starScore#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="companyId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--企业类型 开发区 -->
+	<select id="findCompanyShopCategoryList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		company_shop_category_id desc)rowId,*
+		from (select top
+		($startIndex$+$size$) * from tb_company_shop_category
+		where type=1 and
+		delete_flag = 1
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%$name$%')
+		</isNotEmpty>
+		order by company_shop_category_id desc) ss ) sss where
+		sss.rowId >
+		$startIndex$
+	</select>
+
+	<select id="findCompanyTypeListCount" resultClass="Long">
+		select
+		COUNT(*) from tb_company_shop_category where type=1 and delete_flag =
+		1
+	</select>
+
+
+
+	<!-- 添加企业类型 开发区 -->
+	<insert id="instCompanyShopCategory" parameterClass="CompanyShopCategory">
+		INSERT INTO tb_company_shop_category(name,type)
+		VALUES(#name#,#type#)
+		<selectKey keyProperty="companyShopCategoryId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+
+	<!--开发区 查看企业类型 -->
+	<select id="findCompanyTypeInfo" parameterClass="java.lang.Long"
+		resultClass="CompanyShopCategory">
+		SELECT company_shop_category_id as
+		companyShopCategoryId,name as name,type
+		as type
+		FROM
+		tb_company_shop_category c where company_shop_category_id
+		=#companyShopCategoryId#
+	</select>
+
+	<!-- 更新企业类型 -->
+	<update id="updateCompanyTypeInfo" parameterClass="CompanyShopCategory">
+		update tb_company_shop_category set
+		<isNotEmpty property="name">
+			name = #name#
+		</isNotEmpty>
+		where company_shop_category_id=#companyShopCategoryId#
+	</update>
+
+	<!--店铺类型列表 开发区后台 -->
+	<select id="findShopTypeList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		company_shop_category_id desc)rowId,*
+		from (select top
+		($startIndex$+$size$) * from tb_company_shop_category
+		where type=2 and
+		delete_flag = 1
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%$name$%')
+		</isNotEmpty>
+		order by company_shop_category_id desc) ss ) sss where
+		sss.rowId >
+		$startIndex$
+	</select>
+
+	<!-- 店铺分页 -->
+	<select id="findShopTypeListCount" resultClass="Long">
+		select COUNT(*)
+		from tb_company_shop_category where type=2 and delete_flag =
+		1
+	</select>
+
+	<!-- 添加店铺类型 开发区 -->
+	<insert id="instShopType" parameterClass="CompanyShopCategory">
+		INSERT INTO tb_company_shop_category(name,type)
+		VALUES(#name#,#type#)
+		<selectKey keyProperty="companyShopCategoryId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--开发区 查看店铺类型 -->
+	<select id="findShopTypeInfo" parameterClass="java.lang.Long"
+		resultClass="CompanyShopCategory">
+		SELECT company_shop_category_id as
+		companyShopCategoryId,name as name,type
+		as type
+		FROM
+		tb_company_shop_category c where company_shop_category_id
+		=#companyShopCategoryId#
+	</select>
+
+	<!-- 判断是否是辛巴克 -->
+	<select id="findxinbake" resultClass="Long" parameterClass="java.util.HashMap">
+		select top 1 c.company_id from tb_company c left join Personnel p on
+		c.company_id=p.companyId where p.Type=#type#
+	</select>
+
+	<!-- 更新店铺类型 -->
+	<update id="updateShopTypeInfo" parameterClass="CompanyShopCategory">
+		update tb_company_shop_category set
+		<isNotEmpty property="name">
+			name = #name#
+		</isNotEmpty>
+		where company_shop_category_id=#companyShopCategoryId#
+	</update>
+
+	<select id="findCompanyOffull" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select company_id,name from tb_company
+		<isNotEmpty prepend="where" property="companyId">
+			company_id=#companyId#
+		</isNotEmpty>
+	</select>
+
+	<!--开发区 企业列表的企业星级数 -->
+	<update id="updateCompanyStar" parameterClass="java.util.HashMap">
+		update tb_company
+		set star_score=#starScore# where company_id = #companyId#
+	</update>
+
+	<!-- 删除企业类型 -->
+	<update id="deleteCompanyType" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop_category set delete_flag=2 where
+		company_shop_category_id = #companyShopCategoryId#
+	</update>
+
+	<!--开发区 企业审核 关闭或开启 -->
+	<update id="companyClosrOrOpen" parameterClass="java.util.HashMap">
+		update tb_company
+		set status=#status# , examine_result=#examineResult# where
+		company_id
+		=#companyId# and delete_flag =1
+	</update>
+
+	<!--开发区 企业列表审核通过 1 -->
+	<update id="updateCompanyAuditPass" parameterClass="java.util.HashMap">
+		update
+		tb_company set examine_result=1 where company_id =#companyId#
+	</update>
+	<!--开发区 企业列表审核不通过 2 -->
+	<update id="updateCompanyAuditNoPass" parameterClass="java.util.HashMap">
+		update
+		tb_company set examine_result=2 where company_id =#companyId#
+	</update>
+	<!--开发区 关闭4 -->
+	<update id="closeCompany" parameterClass="java.util.HashMap">
+		update tb_company set
+		examine_result=4 where company_id =#companyId#
+	</update>
+	<!--开发区 查看状态是否重复 -->
+	<select id="checkExamineResult" parameterClass="Long"
+		resultClass="Long">
+		select examine_result as examineResult from tb_company
+		where company_id = #companyId#
+	</select>
+
+	<select id="findcompanyName" parameterClass="String"
+		resultClass="String">
+		select name from tb_company where company_id=#value#
+	</select>
+	<select id="queryNumberCompany" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_company where $filName$>0 and
+		delete_flag!=2 and examine_result!=2
+	</select>
+	<update id="updCompanyRelation" parameterClass="java.util.HashMap">
+		update tb_company
+		set
+		$filName$=#filValue# where company_id=#companyId#
+	</update>
+
+</sqlMap>

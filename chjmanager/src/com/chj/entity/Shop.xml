@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Shop">
+	<typeAlias alias="Shop" type="com.chj.entity.Shop" />
+	<typeAlias alias="PayType" type="com.chj.entity.PayType" />
+	<resultMap class="Shop" id="ShopRes">
+		<result property="companyShopId" column="company_shop_id" />
+		<result property="shopNumber" column="shop_number" />
+		<result property="name" column="name" />
+		<result property="companyId" column="company_id" />
+		<result property="address" column="address" />
+		<result property="sendTime" column="send_time" />
+		<result property="sendPrice" column="send_price" />
+		<result property="payType" column="pay_type" />
+		<result property="deliverOk" column="deliver_ok" />
+		<result property="terminalOk" column="terminal_ok" />
+		<result property="linkman" column="linkman" />
+		<result property="linkmanTel" column="linkman_tel" />
+		<result property="deliverMoney" column="deliver_money" />
+		<result property="categoryTag" column="category_tag" />
+		<result property="categoryName" column="category_name" />
+		<result property="content" column="content" />
+		<result property="workTime" column="work_time" />
+		<result property="lat" column="lat" />
+		<result property="lng" column="lng" />
+		<result property="serviceTime" column="service_time" />
+		<result property="consumptionPer" column="consumption_per" />
+		<result property="registTime" column="regist_time" />
+		<result property="shopType" column="shop_type" />
+		<result property="areaFirstId" column="area_first_id" />
+		<result property="areaSecondId" column="area_second_id" />
+		<result property="examineResult" column="examine_result" />
+		<result property="categoryId" column="category_id" />
+		<result property="status" column="status" />
+	</resultMap>
+
+
+	<typeAlias alias="PayType" type="com.chj.entity.PayType" />
+	<resultMap class="PayType" id="PayTypeRes">
+		<result property="payTypeId" column="pay_type_id" />
+		<result property="payTypeName" column="pay_type_name" />
+		<result property="deleteFlag" column="delete_flag" />
+
+	</resultMap>
+
+	<!-- 保存店铺信息 -->
+	<insert id="saveShopInfo" parameterClass="Shop">
+		INSERT INTO TB_COMPANY_SHOP(
+		<isNotEmpty property="shopNumber">
+			shop_number
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			address
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverOk">
+			deliver_ok
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="terminalOk">
+			terminal_ok
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			linkman_tel
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			linkman
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendPrice">
+			send_price
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverMoney">
+			deliver_money
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendTime">
+			send_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="payType">
+			pay_type
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lat">
+			lat
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lng">
+			lng
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			logo
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="workTime">
+			work_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceTime">
+			service_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="consumptionPer">
+			consumption_per
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaFirstId">
+			area_first_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaSecondId">
+			area_second_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shopType">
+			shop_type
+		</isNotEmpty>
+		,delete_flag,regist_time,examine_result,status)
+		VALUES(
+		<isNotEmpty property="shopNumber">
+			#shopNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			#address#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverOk">
+			#deliverOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="terminalOk">
+			#terminalOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			#linkmanTel#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			#linkman#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendPrice">
+			#sendPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverMoney">
+			#deliverMoney#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendTime">
+			#sendTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="payType">
+			#payType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lat">
+			#lat#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lng">
+			#lng#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			#logo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="workTime">
+			#workTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceTime">
+			#serviceTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="consumptionPer">
+			#consumptionPer#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaFirstId">
+			#areaFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaSecondId">
+			#areaSecondId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shopType">
+			#shopType#
+		</isNotEmpty>
+		,1,#registTime#,#examineResult#,#status#)
+		<selectKey keyProperty="companyShopId" resultClass="long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--店铺权限进入 店铺列表显示 -->
+	<select id="findShopEnterIntoShopList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		company_id)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_company_shop t where delete_flag =1
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyShopId">
+				( t.company_shop_id =
+				#companyShopId#)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				( t.examine_result =
+				#status#)
+			</isNotEmpty>
+		</dynamic>
+		order by company_id) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+
+	<!--店铺权限进入 列表分页 -->
+	<select id="findShopEnterIntoShopListCountPage" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from TB_COMPANY_SHOP where delete_flag =1
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyShopId">
+				(company_shop_id =
+				#companyShopId#)
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				(examine_result =
+				#status#)
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<!-- 店铺列表显示 -->
+	<select id="findShopList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		examine_result desc, company_id)rowId,*
+		from (select top
+		($startIndex$+$size$) s.*,c.name
+		companyName
+		from tb_company_shop s
+		inner join tb_company c on
+		s.company_id=c.company_id where
+		s.delete_flag!=2 and c.delete_flag!=2
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyId">
+				s.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyShopId">
+				s.company_shop_id=#companyShopId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				s.NAME like
+				'%'+#name#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyName">
+				c.name like
+				'%'+#companyName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				s.examine_result =
+				#status#
+			</isNotEmpty>
+			<isNotNull>
+				<isNotEmpty>
+					<isEqual compareValue="1" prepend="AND" property="top">
+						s.order_field>0
+					</isEqual>
+				</isNotEmpty>
+			</isNotNull>
+		</dynamic>
+		order by examine_result desc, company_id) ss ) sss where
+		sss.rowId >
+		$startIndex$
+	</select>
+	<!-- 分页 -->
+	<select id="queryShopCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_company_shop s inner join tb_company c on
+		s.company_id=c.company_id where s.delete_flag!=2 and c.delete_flag!=2
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyId">
+				s.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyShopId">
+				s.company_shop_id=#companyShopId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				s.NAME like
+				'%'+#name#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyName">
+				c.name like
+				'%'+#companyName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				s.examine_result =
+				#status#
+			</isNotEmpty>
+			<isNotNull>
+				<isNotEmpty>
+					<isEqual compareValue="1" prepend="AND" property="top">
+						s.order_field>0
+					</isEqual>
+				</isNotEmpty>
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<!-- 删除店铺信息 -->
+	<delete id="deleteShop" parameterClass="java.util.HashMap">
+		delete from
+		TB_COMPANY_SHOP where company_shop_id=#shopId#
+	</delete>
+
+
+
+	<!-- 查找店铺信息 -->
+	<select id="findShopInfo" parameterClass="Object" resultClass="java.util.HashMap">
+		select
+		company_shop_id,company_id,name,shop_number,address,deliver_ok,logo,
+		terminal_ok,linkman_tel,linkman,send_price,work_time,service_time,consumption_per,
+		shop_type as shopType,category_id,
+		deliver_money,send_time,pay_type,content,lat,lng from
+		TB_COMPANY_SHOP
+		where company_shop_id=#shopId#
+	</select>
+
+
+
+	<!-- 更新店铺信息 -->
+	<update id="updateShopInfo" parameterClass="Shop">
+		update tb_company_shop set
+		<isNotEmpty property="shopNumber">
+			shop_number = #shopNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id =#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			name = #name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			address=#address#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverOk">
+			deliver_ok=#deliverOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="terminalOk">
+			terminal_ok=#terminalOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			linkman_tel=#linkmanTel#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			linkman=#linkman#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendPrice">
+			send_price=#sendPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverMoney">
+			deliver_money=#deliverMoney#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendTime">
+			send_time=#sendTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="payType">
+			pay_type=#payType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lat">
+			lat=#lat#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lng">
+			lng=#lng#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			logo=#logo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content=#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceTime">
+			service_time=#serviceTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="consumptionPer">
+			consumption_per=#consumptionPer#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shopType">
+			shop_type=#shopType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="categoryId">
+			category_id=#categoryId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="workTime">
+			work_time=#workTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaFirstId">
+			area_first_id=#areaFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaSecondId">
+			area_second_id=#areaSecondId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="examineResult">
+			examine_result=#examineResult#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			status=#status#
+		</isNotEmpty>
+		where company_shop_id=#companyShopId#
+	</update>
+
+
+	<!--支付方式显示 -->
+	<select id="findPaytypeList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select * from tb_pay_type t WHERE delete_flag!=2 or
+		delete_flag is null
+
+	</select>
+
+	<!-- 添加支付方式 -->
+	<insert id="instPaytype" parameterClass="PayType">
+		INSERT INTO tb_pay_type(
+		<isNotEmpty property="payTypeName">
+			pay_type_name
+		</isNotEmpty>
+		)
+		VALUES(
+		<isNotEmpty property="payTypeName">
+			#payTypeName#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="payTypeId" resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--开发区 查看支付方式 -->
+	<select id="findPaytypeInfo" parameterClass="java.lang.Long"
+		resultClass="PayType">
+		SELECT pay_type_id as payTypeId,pay_type_name as
+		payTypeName
+		FROM tb_pay_type c where pay_type_id =#payTypeId#
+	</select>
+
+	<!-- 更新企业信息 -->
+	<update id="updatePaytypeInfo" parameterClass="PayType">
+		update tb_pay_type set
+		<isNotEmpty property="payTypeName">
+			pay_type_name = #payTypeName#
+		</isNotEmpty>
+		where pay_type_id=#payTypeId#
+	</update>
+
+
+	<!--自动生成编号 -->
+	<select id="generateShopCode" parameterClass="Long" resultClass="Integer">
+		select count(*) from tb_company_shop p where p.company_id=#value#
+	</select>
+
+	<update id="updateTheShop" parameterClass="Long">
+		update tb_company_shop
+		set delete_flag=2 where company_shop_id=#shopId#
+	</update>
+
+	<!-- 删除支付方式 -->
+	<update id="deletePaytypeInfoList1" parameterClass="java.util.HashMap">
+		update
+		tb_pay_type set delete_flag=2 where pay_type_id=#payTypeId#
+	</update>
+
+	<!-- 账户所属店铺 -->
+	<select id="findCompanyShopInfo" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select name,company_shop_id as companyShopId,company_id as
+		companyId from
+		tb_company_shop where company_id =#companyId#
+	</select>
+	<!-- 开启支付方式 -->
+	<update id="openPaytypeInfoList1" parameterClass="java.util.HashMap">
+		update
+		tb_pay_type set delete_flag=1 where pay_type_id=#payTypeId#
+	</update>
+
+	<!--开发区 更改店铺审核状态 -->
+	<update id="updateShopExamineResult" parameterClass="java.util.HashMap">
+		UPDATE
+		tb_company_shop SET examine_result=#examineResult# WHERE
+		company_shop_id = #companyShopId#
+	</update>
+
+	<!-- 企业下删除店铺信息 -->
+	<update id="deleteCompanyShop" parameterClass="java.util.HashMap">
+		UPDATE
+		tb_company_shop SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+	<!--企业后台 检查是否外送 -->
+	<!-- <select id="checkDeliverOk" parameterClass="java.util.HashMap" resultClass="String"> 
+		select deliver_ok as deliverOk from tb_company_shop where company_shop_id=#shopId# 
+		</select> -->
+	<!-- 店铺申请 关闭审核 -->
+	<update id="closeShopStatus" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop set status=#status#,examine_result=#examineResult#
+		where company_shop_id = #companyShopId#
+	</update>
+	<select id="findShopStatus" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select status from tb_company_shop where company_shop_id =
+		#companyShopId#
+	</select>
+	<update id="updDeliverOk" parameterClass="java.util.HashMap">
+		update tb_company_shop
+		set deliver_ok=#newdeliverOk# where
+		company_shop_id=#companyShopId# and
+		deliver_ok=#deliverOk#
+	</update>
+	<select id="shopNameselet" parameterClass="Long" resultClass="String">
+		select name from tb_company_shop where company_shop_id=#value#
+	</select>
+	<select id="queryNumberShop" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_company_shop where $filName$>0 and
+		delete_flag!=2 and examine_result!=2
+	</select>
+	<update id="updShopRelation" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop set
+		$filName$=#filValue# where company_shop_id=#shopId#
+	</update>
+	<select id="shopWebStatus" resultClass="java.util.HashMap">
+		SELECT * FROM
+		tb_company_shop_status
+	</select>
+	<update id="shopUpdWebStatus" parameterClass="java.util.HashMap">
+		update tb_company_shop_status set value=#codeValue# where code=#code#
+	</update>
+	<update id="deleteTablesColumn" parameterClass="java.util.HashMap">
+		update $tableName$ set delete_flag=2 where $tableColumn$=#columnValue#
+	</update>
+
+</sqlMap>

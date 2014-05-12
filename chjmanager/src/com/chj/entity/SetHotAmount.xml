@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+	   PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+	   "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="SetHotAmount">
+	<typeAlias alias="SetHotAmount"  type="com.chj.entity.SetHotAmount" />
+	<resultMap class="SetHotAmount" id="SetHotAmountMap">
+		<result property="productNum" column="productNum" />
+		<result property="promotionNum" column="promotionNum" />
+		<result property="postNum" column="postNum" />
+		<result property="activityNum" column="activityNum" />
+		<result property="circleNum" column="circleNum" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+	
+	<!-- 设置热门数量 -->
+	<update id="updateHotSet" parameterClass="SetHotAmount">
+	UPDATE tb_hot_set
+	SET  update_time = #updateTime#
+	<isNotEmpty prepend=","  property="productNum"> 
+			productNum = #productNum#
+	</isNotEmpty>
+	<isNotEmpty prepend=","  property="promotionNum"> 
+			promotionNum = #promotionNum#
+	</isNotEmpty>
+	<isNotEmpty prepend=","  property="postNum"> 
+			postNum = #postNum#
+	</isNotEmpty>
+	<isNotEmpty prepend=","  property="activityNum"> 
+			activityNum = #activityNum#
+	</isNotEmpty>
+	<isNotEmpty prepend=","  property="circleNum"> 
+			circleNum = #circleNum#
+	</isNotEmpty>
+	WHERE hotSetNum =#hotSetNum#
+	</update>
+	
+	<select id="findHotSet" resultClass="SetHotAmount">
+			SELECT    productNum
+					      ,promotionNum
+					      ,postNum
+					      ,activityNum
+					      ,circleNum
+					      ,update_time
+			 FROM tb_hot_set
+	</select>
+	
+</sqlMap>	

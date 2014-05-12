@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CompanyTagRecord">
+	<typeAlias alias="CompanyTagRecord" type="com.chj.entity.CompanyTagRecord" />
+
+	<resultMap class="CompanyTagRecord" id="CompanyTagRecordRes">
+		<result property="companyTagId" column="company_tag_id" />
+		<result property="companyId" column="company_id" />
+		<result property="tagId" column="tag_id" />
+		<result property="status" column="status" />
+		<result property="addTime" column="add_time" />
+	</resultMap>
+	<insert id="insertTag" parameterClass="CompanyTagRecord">
+	INSERT INTO tb_company_tag(company_id,tag_id,add_time)
+	                    VALUES(#companyId#, #tagId#,#addTime#)
+		<selectKey keyProperty="companyTagId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+		<delete id="delCompanyTag" parameterClass="Long">
+		delete from tb_company_tag where company_id = #value#
+	</delete>
+</sqlMap>

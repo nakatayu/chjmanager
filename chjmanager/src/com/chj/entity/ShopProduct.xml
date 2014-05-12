@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ShopProduct">
+	<typeAlias alias="ShopProduct" type="com.chj.entity.ShopProduct" />
+	<resultMap class="ShopProduct" id="ShopProductRes">
+		<result property="companyShopProductId" column="company_shop_product_id" />
+		<result property="companyShopId" column="company_shop_id" />
+		<result property="productId" column="product_id" />
+		<result property="functionType" column="function_type" />
+		<result property="orderFieldFunction" column="order_field_function" />
+		<result property="orderFieldCategory" column="order_field_category" />
+		<result property="productShopCategoryId" column="product_shop_category_id" />
+
+		<result property="shopProductSkuList" column="company_shop_product_id"
+			select="selectShopProductSkuListById" />
+		<result property="productName" column="product_id" select="selectProductNameById" />
+	</resultMap>
+
+	<typeAlias alias="ShopProductPart" type="com.chj.entity.ShopProductPart" />
+	<resultMap class="ShopProductPart" id="ShopProductPartRes">
+		<result property="productId" column="product_id" />
+		<result property="productName" column="name" />
+	</resultMap>
+	<typeAlias alias="ShopProductSku" type="com.chj.entity.ShopProductSku" />
+	<resultMap class="ShopProductSku" id="ShopProductSkuRes">
+		<result property="companyShopProductSkuId" column="company_shop_product_sku_id" />
+		<result property="companyShopProductId" column="company_shop_product_id" />
+		<result property="productSkuId" column="product_sku_id" />
+		<result property="stock" column="stock" />
+		<result property="stockDay" column="stock_day" />
+
+		<result property="sku" column="product_sku_id" select="selectProductSkuById" />
+	</resultMap>
+	<select id="selectShopProductSkuListById" parameterClass="Long"
+		resultMap="ShopProductSkuRes">
+		select * from tb_company_shop_product_sku where
+		company_shop_product_id=#value# and delete_flag!=2
+	</select>
+	<select id="selectProductNameById" parameterClass="Long"
+		resultClass="String">
+		select name from tb_product where product_id=#value#
+	</select>
+	<select id="selectProductSkuById" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select sku_kind as skuKind,price from tb_product_sku where
+		product_sku_id=#value#
+	</select>
+
+	<select id="selectShopSelectedProductList" resultMap="ShopProductRes"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		company_shop_product_id desc)rowId,*
+		from (select top
+		($startIndex$+$size$) * from tb_company_shop_product t where
+		t.delete_flag!=2 and company_shop_id=#companyShopId#
+		and exists(select
+		kk.product_id from tb_product kk where
+		kk.delete_flag!=2 and
+		kk.product_id=t.product_id)
+		and exists(select g.company_shop_product_id
+		from tb_company_shop_product_sku g
+		where
+		g.company_shop_product_id=t.company_shop_product_id
+		and
+		g.delete_flag!=2)
+		<isNotEmpty property="shopProCategoryId" prepend="AND">
+			product_shop_category_id = #shopProCategoryId#
+		</isNotEmpty>
+		order by company_shop_product_id desc) ss ) sss where
+		sss.rowId >
+		$startIndex$
+	</select>
+
+	<select id="selectShopSelectedProductListCount" resultClass="Long"
+		parameterClass="java.util.HashMap">
+		select count(*) from tb_company_shop_product t where t.delete_flag!=2
+		and company_shop_id=#companyShopId#
+		and exists(select kk.product_id
+		from tb_product kk where
+		kk.delete_flag!=2 and
+		kk.product_id=t.product_id)
+		and exists(select g.company_shop_product_id
+		from tb_company_shop_product_sku g where
+		g.company_shop_product_id=t.company_shop_product_id
+		and
+		g.delete_flag!=2)
+		<isNotEmpty property="shopProCategoryId" prepend="AND">
+			product_shop_category_id = #shopProCategoryId#
+		</isNotEmpty>
+	</select>
+
+
+	<select id="findShopUnselectProduct" resultMap="ShopProductPartRes"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order
+		by
+		product_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$)
+		product_id,name
+		from tb_product t where company_id=#companyId# and
+		delete_flag!=2 and
+		product_id not in(
+		(select s.product_id from
+		tb_company_shop_product s
+		where s.delete_flag!=2 and
+		s.company_shop_id=#shopId# and exists
+		(select
+		COUNT(ss.company_shop_product_id),company_shop_product_id from
+		tb_company_shop_product_sku ss where ss.delete_flag!=2 and
+		s.company_shop_product_id = ss.company_shop_product_id group by
+		ss.company_shop_product_id
+		having COUNT(ss.company_shop_product_id)=
+		(select count(uu.product_id) from
+		tb_product_sku uu where
+		uu.product_id=s.product_id and
+		uu.delete_flag!=2 group by
+		uu.product_id)
+		))) order by product_id desc)
+		ss ) sss where
+		sss.rowId >
+		$startIndex$
+	</select>
+	<select id="findShopUnselectProductCount" resultClass="Long"
+		parameterClass="java.util.HashMap">
+		select count(*) from tb_product t where
+		company_id=#companyId# and
+		delete_flag!=2 and product_id not in(
+		(select s.product_id from
+		tb_company_shop_product s where
+		s.delete_flag!=2 and
+		s.company_shop_id=#shopId# and exists
+		(select
+		COUNT(ss.company_shop_product_id),company_shop_product_id from
+		tb_company_shop_product_sku ss where ss.delete_flag!=2 and
+		s.company_shop_product_id = ss.company_shop_product_id group by
+		ss.company_shop_product_id
+		having COUNT(ss.company_shop_product_id)=
+		(select count(uu.product_id) from
+		tb_product_sku uu where
+		uu.product_id=s.product_id and
+		uu.delete_flag!=2 group by
+		uu.product_id)
+		)))
+
+	</select>
+	<select id="selectShopProductSkuList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select product_sku_id as productSkuId,sku_no as skuNo,sku_kind as
+		skuKind,price,old_price as oldPrice
+		from tb_product_sku k where
+		delete_flag!=2 and k.product_id =#productId#
+		<isNotEmpty prepend="AND" property="companyShopProductId">
+			product_sku_id not in
+			(select product_sku_id from tb_company_shop_product_sku where
+			delete_flag!=2
+			and company_shop_product_id=#companyShopProductId#)
+		</isNotEmpty>
+
+	</select>
+	<select id="selectShopProductId" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select top 1 company_shop_product_id from
+		tb_company_shop_product
+		where product_id=#productId# and
+		company_shop_id=#shopId#
+	</select>
+
+	<insert id="insertCompanyShopProductZhao" parameterClass="java.util.HashMap">
+		insert into
+		tb_company_shop_product(company_shop_id,product_id,function_type,product_shop_category_id,create_time)
+		values(#shopId#,#productId#,#functionType#,#shopCategoryId#,#create_time#)
+		<selectKey keyProperty="companyShopProductId" resultClass="long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<update id="updateCompanyShopProduct" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop_product set delete_flag=1,
+		function_type=#functionType#,product_shop_category_id=#shopCategoryId#,
+		create_time=#create_time# where
+		company_shop_product_id=#companyShopProductId#
+	</update>
+	<select id="selectCompanyShopProductSkuId" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select top 1 company_shop_product_sku_id from
+		tb_company_shop_product_sku
+		where
+		company_shop_product_id=#companyShopProductId# and
+		product_sku_id=#skuId#
+	</select>
+	<insert id="insertCompanyShopProductSkuZhao" parameterClass="java.util.HashMap">
+		insert into
+		tb_company_shop_product_sku(company_shop_product_id,product_sku_id,stock,stock_day)
+		values(#companyShopProductId#,#skuId#,#stock#,#stock#)
+		<selectKey keyProperty="companyShopProductId" resultClass="long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	<update id="updateCompanyShopProductSkuZhao" parameterClass="java.util.HashMap">
+		update tb_company_shop_product_sku set delete_flag=1, stock=#stock#,
+		stock_day=#stock# where
+		company_shop_product_sku_id=#companyShopProductSkuId#
+	</update>
+
+	<update id="deleteShopSelectedProduct" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop_product set delete_flag=2 where
+		company_shop_product_id=#companyShopProductId#
+		and company_shop_id
+		=#shopId#
+	</update>
+	<update id="deleteShopSelectedProductSku" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop_product_sku set delete_flag=2 where
+		company_shop_product_id=#companyShopProductId#
+	</update>
+
+	<update id="updateShopProduct" parameterClass="Long">
+		update
+		tb_company_shop_product set delete_flag=2 where
+		company_shop_id=#shopId#
+	</update>
+
+	<update id="deleteProductInfo" parameterClass="java.util.HashMap">
+		update tb_product set delete_flag=2 where product_id=#productId#
+		<isNotEmpty prepend="AND" property="companyId">
+			company_id=#companyId#
+		</isNotEmpty>
+	</update>
+
+	<!-- 店铺下商品修改是否促销 -->
+	<update id="updateCompanyShopProductFunctionType"
+		parameterClass="java.util.HashMap">
+		update tb_company_shop_product set function_type
+		=#functionType# where
+		company_shop_product_id=#companyShopProductId#
+	</update>
+	<update id="updshopproductSku" parameterClass="long">
+		update
+		tb_company_shop_product_sku set delete_flag=2 where
+		product_sku_id=#value#
+	</update>
+	<update id="updShopProductStocktimer">
+		update tb_company_shop_product_sku set
+		stock=stock_day where delete_flag!=2
+	</update>
+
+</sqlMap>

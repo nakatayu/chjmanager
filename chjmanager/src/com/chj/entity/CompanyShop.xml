@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CompanyShop">
+	<typeAlias alias="CompanyShop" type="com.chj.entity.CompanyShop" />
+
+	<resultMap class="CompanyShop" id="CompanyShopRes">
+		<result property="companyShopId" column="company_shop_id" />
+		<result property="name" column="name" />
+		<result property="address" column="address" />
+		<result property="companyId" column="company_id" />
+		 <result property="email" column="email" />
+		<result property="registTime" column="regist_time" />
+		<result property="logo" column="logo" />
+		<result property="location" column="location" />
+		<result property="categoryId" column="category_id" />
+		<result property="consumptionPer" column="consumption_per" />
+		<result property="orderField" column="order_field" />
+		<result property="sendTime" column="send_time" />
+		<result property="sendPrice" column="send_price" />
+		<result property="payType" column="pay_type" />
+		<result property="areaFirstId" column="area_first_id" />
+		<result property="areaSecondId" column="area_second_id" />
+		<result property="deliverOk" column="deliver_ok" />
+		<result property="terminalOk" column="terminal_ok" />
+		<result property="linkman" column="linkman" />
+		<result property="linkmanTel" column="linkman_tel" />
+		<result property="shopNumber" column="shop_number" /> 
+	</resultMap>
+
+	<select id="selTop4RestaurantList" resultClass="java.util.HashMap">
+		select
+		company_shop_id as companyShopId, name,logo,consumption_per as
+		consumptionPer from tb_company_shop t where
+		exists(select * from
+		tb_product_category s where s.product_category_id
+		=t.category_id)
+	</select>
+
+	<select id="selShopTagList" parameterClass="Long" resultClass="java.util.HashMap">
+		select tag_name as tagName,tag_id as tagId from tb_tag t where
+		exists(select * from tb_company_shop_tag s where
+		s.company_shop_id=#value# and s.tag_id =t.tag_id)
+	</select>
+
+	<select id="findShop" parameterClass="java.util.HashMap"
+		resultMap="CompanyShopRes">
+		select top $size$ * from (select row_number()over(order by
+		company_id)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_company_shop t
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="companyId"> 
+			(company_id= #companyId#)
+			</isNotEmpty>
+		</dynamic>
+		order by company_id) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<select id="findShopCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_company_shop where company_id =
+		#companyId#
+	</select>
+
+	<!-- 保存店铺信息 -->
+	<insert id="queryShopInfo" parameterClass="CompanyShop">
+		INSERT INTO 
+		TB_COMPANY_SHOP (company_shop_id, name,address,email,company_id,
+		regist_time,logo,location,category_id,consumption_per,
+		 order_field,send_time,send_price,pay_type,area_first_id,
+		area_second_id,)
+		VALUES(companyShopId,name,address,email,companyId,registTime,logo,location,
+		categoryId,consumptionPer,orderField,sendTime,sendPrice,payType,
+		areaFirstId,areaSecondId,)
+		<selectKey keyProperty="CompanyShopId" resultClass="long"
+			type="post">
+			select @@IDENTITY as saveShopInfoId
+		</selectKey>
+	</insert>
+</sqlMap>

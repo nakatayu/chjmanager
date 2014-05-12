@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace="Push">
+    <typeAlias alias="Push" type="com.chj.entity.Push"/>
+    <resultMap class="Push" id="PushRes">
+    <result property="pushId" column="push_id"/>
+     <result property="personnelId" column="personnel_id"/>
+     <result property="personnelType" column="personnel_type"/>
+     <result property="content" column="content"/>
+     <result property="manner" column="manner"/>
+     <result property="applyTime" column="apply_time"/>
+     <result property="qty" column="qty"/>
+     <result property="status" column="status"/>
+     <result property="sex" column="sex"/>
+     <result property="age" column="age"/>
+     <result property="opinion" column="opinion"/>
+      <result property="roleId" column="role_id"/>
+       <result property="relevanceType" column="relevance_type"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+    
+    <!-- 推送信息保存 -->
+    <insert id="insertPushInfo"  parameterClass="Push"  >
+		INSERT INTO tb_push(
+		apply_time
+		<isNotEmpty  prepend=","  property="content">
+			content 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="manner">
+			manner
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="sex">
+			sex
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="age">
+			age 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="opinion">
+			opinion 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="status">
+			status 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="roleId">
+			role_id 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="personnelId">
+			personnel_id 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="personnelType">
+			personnel_type
+		</isNotEmpty>
+			<isNotEmpty  prepend=","  property="relevanceType">
+			relevance_type
+		</isNotEmpty>)
+     VALUES
+           ( #applyTime#
+           <isNotEmpty  prepend=","  property="content">
+			#content# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="manner">
+			#manner#
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="sex">
+			#sex#
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="age">
+			#age# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="opinion">
+			#opinion# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="status">
+			#status# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="roleId">
+			#roleId# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="personnelId">
+			#personnelId# 
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="personnelType">
+			#personnelType#
+		</isNotEmpty>
+			<isNotEmpty  prepend=","  property="relevanceType">
+			#relevanceType# 
+		</isNotEmpty>)
+		<selectKey keyProperty="pushId" resultClass="long"
+			type="post">
+			select @@IDENTITY as pushId
+		</selectKey>
+	</insert>	 
+     <insert id="insertPushInfoTag"  parameterClass="java.util.HashMap" >
+		INSERT INTO tb_push_tag(push_id,tag_id,create_time) values(#pushId#,#tagId#,getdate())
+	</insert>
+  <!-- 推送信息  列表 -->
+<select id="findPushListInfo"  resultClass="java.util.HashMap"  parameterClass="java.util.HashMap">
+
+select top $size$ * from (select row_number()over(order by apply_time desc)rowId,*
+		from (select top ($startIndex$+$size$) * from 
+		(select p.username,p.type,p.OrganizationalId,content,manner,apply_time,ph.status,opinion,ph.push_id from tb_push ph
+ inner join Personnel p on ph.Personnel_id = p.ID  where ph.delete_flag!=2
+ 		<dynamic prepend="">
+				<isNotEmpty prepend="AND" property="organizationalid"> 
+				ph.role_id=#organizationalid#
+				</isNotEmpty>
+		</dynamic>)p
+ order by apply_time desc) ss
+		 ) sss
+where sss.rowId>$startIndex$
+	</select>
+	
+ <!--推送信息  列表分页 -->
+ <select id="findPushListInfoCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_push ph
+ inner join Personnel p on ph.Personnel_id = p.ID where ph.delete_flag!=2
+ <dynamic prepend="">
+				<isNotEmpty prepend="AND" property="organizationalid"> 
+				ph.role_id=#organizationalid#
+				</isNotEmpty>
+</dynamic>
+</select>
+    
+	<!-- 查询  推送对象基本信息 -->
+  <select id="findPushInfo" parameterClass="Push" resultClass="java.util.HashMap">
+	 select * from tb_push where push_id = #pushId#
+</select>
+ 
+  <!-- 更新  推送对象基本信息 -->
+    <update id="updatePushInfo"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_push
+   SET  apply_time =GETDATE()
+   		<isNotEmpty  prepend=","  property="manner">
+			manner = #manner#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			 content =#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sex">
+			sex=#sex#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="age">
+			age=#age#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="opinion">
+			opinion=#opinion#
+		</isNotEmpty>
+		<isNotEmpty  prepend=","  property="relevanceType">
+			relevance_type=#relevanceType# 
+		</isNotEmpty>
+		 WHERE  push_id = #pushId# 
+    </update>
+   
+  <!--  查看   改变状态为审核中 -->
+    <update id="updatePushInfoStatus"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_push  SET   status=#status#,opinion=#checkContent# WHERE  push_id = #pushId# 
+    </update>
+    
+     <!-- 假删除    改变状态 -->
+    <update id="updatePushInfoDeleteFlag"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_push  SET delete_flag=#deleteFlag# WHERE  push_id = #pushId# 
+    </update>
+    <select id="findOrganizationName" parameterClass="java.util.HashMap" resultClass="String">
+     select $fieldRt$ from $table$ where $fieldCondition$ =#fieldParam#
+    </select>
+    <select id="findPushInfoDetail" parameterClass="Long" resultMap="PushRes">
+    select * from tb_push where push_id=#value#
+    </select>
+    <select id="findPushInfoTagList" parameterClass="Long" resultClass="java.util.HashMap">
+     select tag_id as tagId,tag_name as tagName from tb_tag t 
+     where t.delete_flag!=2 and exists(select tt.tag_id from tb_push_tag tt where tt.push_id=#value# and t.tag_id=tt.tag_id)
+    </select>
+    <select id="findPushPhoneId" parameterClass="Push" resultClass="Object">
+    select distinct $field$  from tb_user t where phone_type=#phoneType# and phone_id is not null and phone_id!=''
+    <isEqual prepend="AND" property="sex" compareValue="1">
+      sex='M'
+    </isEqual>
+    <isEqual prepend="AND" property="sex" compareValue="2">
+      sex='W'
+    </isEqual>
+    <isEqual prepend="AND" property="age" compareValue="1">
+      birth_date >= DATEADD(YYYY,-20, getdate())
+    </isEqual>
+    <isEqual prepend="AND" property="age" compareValue="2">
+      <![CDATA[  birth_date >=DATEADD(YYYY,-25, getdate()) and  birth_date <=DATEADD(YYYY,-21, getdate()) ]]>
+    </isEqual>
+    <isEqual prepend="AND" property="age" compareValue="3">
+      <![CDATA[  birth_date >=DATEADD(YYYY,-30, getdate()) and  birth_date <=DATEADD(YYYY,-26, getdate()) ]]>
+    </isEqual>
+    <isEqual prepend="AND" property="age" compareValue="4">
+      <![CDATA[  birth_date >=DATEADD(YYYY,-40, getdate()) and  birth_date <=DATEADD(YYYY,-31, getdate()) ]]>
+    </isEqual>
+     <isEqual prepend="AND" property="age" compareValue="5">
+      <![CDATA[ birth_date <=DATEADD(YYYY,-41, getdate()) ]]>
+    </isEqual>
+    <isEqual prepend="AND" property="buyFlag" compareValue="1">
+      <isEqual prepend="AND" property="personnelType" compareValue="2">
+        exists(select hh.user_id from tb_order hh where hh.user_id=t.user_id and 
+        exists(select hhh.company_shop_id from tb_company_shop hhh where hhh.company_shop_id=hh.shop_id and hhh.company_id=#roleId#))
+      </isEqual>
+      <isEqual prepend="AND" property="personnelType" compareValue="4">
+        exists(select hh.user_id from tb_order hh where hh.user_id=t.user_id and 
+        exists(select hhh.company_shop_id from tb_company_shop hhh where hhh.company_shop_id=hh.shop_id and hhh.company_id=#roleId#))
+      </isEqual>
+       <isEqual prepend="AND" property="personnelType" compareValue="3">
+         exists(select hh.user_id from tb_order hh where hh.user_id=t.user_id and hh.shop_id=#roleId#)
+       </isEqual>
+        <isEqual prepend="AND" property="personnelType" compareValue="5">
+         exists(select hh.user_id from tb_order hh where hh.user_id=t.user_id and hh.shop_id=#roleId#)
+       </isEqual>
+    </isEqual>
+    <isEqual prepend="AND" property="collectoionFlag" compareValue="1">
+      <isEqual prepend="AND" property="personnelType" compareValue="2">
+        exists(select kk.user_id from tb_user_collection kk where kk.user_id=t.user_id and kk.do_type=1 and ((kk.object_id=#roleId#   and kk.type=1 ) or 
+        exists(select kkk.company_shop_id from tb_company_shop kkk where kkk.company_shop_id=kk.object_id and kk.type=2 and kkk.company_shop_id=#roleId#)))
+      </isEqual>
+     <isEqual prepend="AND" property="personnelType" compareValue="4">
+        exists(select kk.user_id from tb_user_collection kk where kk.user_id=t.user_id and kk.do_type=1 and ((kk.object_id=#roleId#   and kk.type=1 ) or 
+        exists(select kkk.company_shop_id from tb_company_shop kkk where kkk.company_shop_id=kk.object_id and kk.type=2 and kkk.company_shop_id=#roleId#)))
+      </isEqual>
+       <isEqual prepend="AND" property="personnelType" compareValue="3">
+        exists(select kk.user_id from tb_user_collection kk where kk.user_id=t.user_id and kk.do_type=1 and kk.object_id=#roleId#   and kk.type=1)
+       </isEqual>
+        <isEqual prepend="AND" property="personnelType" compareValue="5">
+         exists(select kk.user_id from tb_user_collection kk where kk.user_id=t.user_id and kk.do_type=1 and kk.object_id=#roleId#   and kk.type=1)
+       </isEqual>
+    </isEqual>
+    <isEqual prepend="AND" property="circleFlag" compareValue="1">
+    	exists(select mm.user_id from tb_circle_user mm where mm.user_id=t.user_id and mm.delete_flag!=2 and exists(select * from tb_circle
+    	mmm where mm.circle_id=mmm.circle_id and mmm.company_id =(select company_id from Personnel where id=#personnelId#)))
+    </isEqual>
+	 and exists(select r.tag_id from tb_user_tag r where exists(select * from tb_push_tag rr where rr.push_id=#pushId# and rr.tag_id=r.tag_id))
+	
+    </select>
+    
+  
+</sqlMap>    

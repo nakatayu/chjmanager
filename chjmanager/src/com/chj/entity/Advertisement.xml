@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace="Advertisement">
+    <typeAlias alias="Advertisement" type="com.chj.entity.Advertisement"/>
+    <resultMap class="Advertisement" id="AdvertisementRes">
+     <result property="advertisementId" column="advertisement_id"/>
+     <result property="pictureAddress" column="picture_address"/>
+     <result property="style" column="style"/>
+     <result property="pictureTitle" column="picture_title"/>
+     <result property="linkAddress" column="link_address"/>
+    </resultMap>
+    
+    <!--  广告设置 -->
+    <select id="findAdvertiSementList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select * from  tb_advertisement_picture where delete_flag =1
+	</select>
+	
+	<!--  app首页中显示列表显示的内容是什么模块 -->
+    <select id="advertisementInfo" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select product_type as productType, service_type as serviceType,  first_type as firstType, relation_type as relationType
+         from tb_first_extend  
+	</select>
+	
+	<!--  更新app首页中显示的列表 -->
+    <update id="updateAppToFirstExtendInfo" parameterClass="java.util.HashMap">
+       UPDATE tb_first_extend SET first_type=#firstType#, relation_type=#relationType#, 
+       product_type=#productType#, service_type=#serviceType#
+	</update>
+	
+	<!-- 删除广告 -->
+ 	<update id="deleteAdvertiSementList" parameterClass="java.util.HashMap">
+		update  tb_advertisement_picture set delete_flag=2 where advertisement_id = #advertisementId#
+	</update> 
+	
+	
+ <!-- 增加广告 -->	
+<insert id="insertAdvertiSementInfo"  parameterClass="Advertisement"  >
+		INSERT INTO tb_advertisement_picture  (
+		<isNotEmpty  property="pictureAddress">
+			picture_address
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="style">
+			style
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pictureTitle">
+			picture_title
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkAddress">
+			link_address
+		</isNotEmpty>
+		) VALUES(
+			<isNotEmpty  property="pictureAddress">
+			#pictureAddress#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="style">
+			#style#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pictureTitle">
+			#pictureTitle#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkAddress">
+			#linkAddress#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="advertisementId"  resultClass="Long"  type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>	 
+	
+<!-- 查找广告 -->
+  <select id="findAdvertiSementInfo" parameterClass="Advertisement" resultClass="java.util.HashMap">
+	  select * from  tb_advertisement_picture where advertisement_id = #advertisementId#
+</select>
+	
+<!-- 更新广告 -->
+    <update id="updateAdvertiSementInfo"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_advertisement_picture
+   SET
+   		<isNotEmpty property="style">
+			style = #style#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pictureAddress">
+			 picture_address =#pictureAddress#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pictureTitle">
+			picture_title =#pictureTitle#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkAddress">
+			link_address=#linkAddress#
+		</isNotEmpty>
+		 WHERE advertisement_id = #advertisementId#
+    </update>
+
+    <!--  查询web的页面广告设列表-->
+    <select id="findWebAdvertisementList" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+        select * from  tb_advertisement_picture_web where delete_flag =1
+	</select>
+    
+    <!-- 查找web广告详情 -->
+  <select id="findWebAdvertisementInfo" parameterClass="LONG" resultClass="java.util.HashMap">
+	  select * from  tb_advertisement_picture_web where advertisement_id = #advertisementId#
+</select>
+
+
+<!-- 更新web广告信息-->
+    <update id="updateWebAdvertisementInfo"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_advertisement_picture_web
+         SET  picture_address =#pictureAddress#,picture_title =#pictureTitle#, 
+		 link_address=#linkAddress#, page_web=#pageWeb#,  page_position=#pagePosition#,  page_name=#pageName#
+		 WHERE advertisement_id = #advertisementId#
+	 
+    </update>
+    
+    
+    
+    
+    
+  <!--查找关键词列表	-->
+    <select id="selectControlList1" resultClass="java.util.HashMap" parameterClass="java.util.HashMap">
+          select top $size$ * from (select row_number()over(order by
+		control_id)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_public_opinion_control t where delete_flag =1
+		order by control_id) ss ) sss where
+		sss.rowId > $startIndex$
+	</select> 
+	  <!--查找关键词列表	分页-->
+    <select id="selectControlListPageCount" resultClass="Long" >
+        select COUNT(*) from  tb_public_opinion_control where delete_flag =1
+	</select> 
+	 
+<!-- 更新 关键词	-->
+    <update id="updateControl1"  parameterClass="java.util.HashMap"  >
+      	UPDATE  tb_public_opinion_control
+         SET  control_name =#controlName#,create_time =#createTime#
+		 WHERE control_id = #controlId#
+    </update>
+<!-- 增加关键词 -->	
+     <insert id="addControl1"  parameterClass="java.util.HashMap"  >
+		INSERT INTO tb_public_opinion_control (control_name,create_time) VALUES(#controlName#,#createTime#)
+	</insert>
+
+    <select id="selectOpinion" resultClass="String">
+        select control_name from tb_public_opinion_control where delete_flag=1
+    </select>
+
+	<!-- 删除广告 -->
+ 	<update id="deleteControl1" parameterClass="java.util.HashMap">
+		update  tb_public_opinion_control set delete_flag=2 where control_id = #deleteControlId#
+	</update> 		
+		
+ 
+</sqlMap>     

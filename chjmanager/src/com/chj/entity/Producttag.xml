@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Producttag">
+	<typeAlias alias="Producttag" type="com.chj.entity.Producttag" />
+	<resultMap class="Producttag" id="ProducttagRes">
+		<result property="productTagId" column="product_tag_id" />
+		<result property="productId" column="product_id" />
+		<result property="tagId" column="tag_id" />
+		<result property="addTime" column="add_time" />
+		<result property="status" column="status" />
+	</resultMap>
+
+	<!-- 已选标签保存 -->
+	<insert id="saveProductTag" parameterClass="Producttag">
+		INSERT INTO tb_product_tag(product_id,tag_id
+		)
+		VALUES(#productId#, #tagId#
+		)
+		<selectKey keyProperty="productTagId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	
+	<!-- 查找商品标签  tb_product_tag-->
+	<select id="findProductTag" parameterClass="Object" resultClass="java.util.HashMap">
+		select tag_name,a.tag_id from dbo.tb_product_tag t left join tb_tag a on t.tag_id=a.tag_id
+			          where product_id=#productId# 
+ 	</select>	
+ 	
+	<!--  删除已选标签 
+	<delete id="deleteShopTag" parameterClass="java.util.HashMap">
+				delete from tb_company_shop_tag where company_shop_id=#shopId#
+ 	</delete>
+ 	
+ 	 -->
+</sqlMap>

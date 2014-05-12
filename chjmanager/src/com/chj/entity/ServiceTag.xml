@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap
+        PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ServiceTag">
+	<typeAlias alias="ServiceTag" type="com.chj.entity.ServiceTag" />
+
+	<resultMap class="ServiceTag" id="ServiceTagId">
+		<result property="serviceTagId" column="service_tag_id" />
+		<result property="serviceId" column="service_id" />
+		<result property="tagId" column="tag_id" />
+		<result property="addTime" column="add_time" />
+		<result property="status" column="status" />
+	</resultMap>
+
+<!-- 保存服务信息标签 -->
+	<insert id="seveServiceTag" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_service_tag(service_id,tag_id,add_time,status)
+		VALUES(#serviceId#,#tagId#,#addTime#,#status#)
+	</insert>
+
+
+	<!-- 查找标签 tb_service_tag-->
+	<select id="findServiceTag" parameterClass="Object" resultClass="java.util.HashMap">
+			select tag_name,a.tag_id from tb_service_tag t left join tb_tag a on t.tag_id=a.tag_id
+			          where service_id=#serviceId#
+ 	</select>	
+
+<!-- 删除已选标签 -->
+	<delete id="deleteServiceTag" parameterClass="java.util.HashMap">
+				delete from tb_service_tag where service_id=#serviceId#
+ 	</delete>
+<!-- 增加已选标签 -->
+<insert id="addServiceTag" parameterClass="ServiceTag">
+		INSERT INTO tb_service_tag(service_id,tag_id,delete_flag
+		)
+		VALUES(#serviceId#, #tagId#,1)
+	</insert>
+
+
+
+</sqlMap> 

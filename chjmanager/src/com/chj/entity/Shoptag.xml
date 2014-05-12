@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Shoptag">
+	<typeAlias alias="Shoptag" type="com.chj.entity.Shoptag" />
+	<resultMap class="Shoptag" id="ShoptagRes">
+		<result property="companyShopId" column="company_shop_id" />
+		<result property="shopTagId" column="shop_tag_id" />
+		<result property="tagId" column="tag_id" />
+		<result property="addTime" column="add_time" />
+		<result property="status" column="status" />
+	</resultMap>
+
+	<!-- 已选标签保存 -->
+	<insert id="saveShopTag" parameterClass="Shoptag">
+		INSERT INTO TB_COMPANY_SHOP_TAG(company_shop_id,tag_id)
+		VALUES(#companyShopId#, #tagId#)
+	</insert>
+		
+	<!-- 删除已选标签 -->
+	<delete id="deleteShopTag" parameterClass="java.util.HashMap">
+				delete from tb_company_shop_tag where company_shop_id=#companyShopId#
+ 	</delete>
+ 	
+ 	<!-- 查找已选标签 和 更新已选 -->
+	<select id="findShopTag" parameterClass="Object" resultClass="java.util.HashMap">
+			select tag_name,a.tag_id from tb_company_shop_tag t left join tb_tag a on t.tag_id=a.tag_id
+			          where company_shop_id=#shopId#
+ 	</select>
+ 	<!-- 删除店铺标签 -->
+ 	<update id="updateShopTag" parameterClass="java.util.HashMap">
+ 		UPDATE tb_company_shop_tag  SET delete_flag = 2  WHERE company_shop_id = #shopId#
+ 	</update>
+</sqlMap>

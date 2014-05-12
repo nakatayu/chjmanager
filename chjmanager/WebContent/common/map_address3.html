@@ -1,0 +1,63 @@
+﻿﻿<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>逆地理编码</title>
+<link rel="stylesheet" type="text/css" href="/Public/css/demo.Default.css" /> 
+<script type="text/javascript"	src="http://webapi.amap.com/maps?v=1.2&key=57a5a7b350ad90c9bf5b9889b360f37e"></script>
+<script language="javascript">
+var mapObj;
+function mapInit() {
+    var opt = {
+        level: 13, //设置地图缩放级别  
+        center: new AMap.LngLat(121.409225, 31.166691) //设置地图中心点 
+    }
+    mapObj = new AMap.Map("iCenter", opt);
+    generateLatLng();
+    if(lat==0 || lat==null||lat==''||lng==0 || lng==null||lng==''){
+    	alert('经纬度获取错误!');
+    	return;
+    }
+    var marker = new AMap.Marker({
+        map:mapObj,
+		draggable :false,
+        icon: new AMap.Icon({
+            image: "http://www.amap.com/images/mark.png",
+            size:new AMap.Size(58,30),
+            imageOffset: new AMap.Pixel(-32, -0)
+        }),
+        position: new AMap.LngLat(lng, lat),
+        offset: new AMap.Pixel(-5,-30)
+    });
+	 
+    mapObj.setFitView();
+	
+}
+var lat=0,lng=0;
+function generateLatLng(){
+	 var bname = navigator.appName;   
+	 if (bname.search(/netscape/i) == 0)   
+	 {
+	  lat=window.opener.document.getElementById("hiddenAddressLat").value;
+	  lng=window.opener.document.getElementById("hiddenAddressLng").value;
+	 }   
+	 else if (bname.search(/microsoft/i) == 0)   
+	 {   
+	 lat = window.opener.document.all.hiddenAddressLat.innerHTML;
+	 lng = window.opener.document.all.hiddenAddressLng.innerHTML;
+	 }   
+}
+</script>
+</head>
+<body onload="mapInit();">
+<table align="center">
+<tr><td>
+    <div id="iCenter" style="width:800px;height:600px;" ></div>
+	</td>
+	<td>
+   <!-- <input id="result"  width="200"/>  --> 
+       
+	<td>
+	</tr></table>
+</body>
+</html>

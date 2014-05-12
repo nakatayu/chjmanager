@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Personnel">
+	<typeAlias alias="Personnel" type="com.chj.entity.Personnel" />
+	<resultMap class="Personnel" id="PersonnelRes">
+		<result property="id" column="ID" />
+		<result property="organizationalID" column="OrganizationalID" />
+		<result property="name" column="Name" />
+		<result property="pwd" column="Pwd" />
+		<result property="userName" column="UserName" />
+		<result property="gender" column="Gender" />
+		<result property="email" column="Email" />
+		<result property="phone" column="Phone" />
+		<result property="cardNo" column="CardNo" />
+		<result property="createdDate" column="CreatedDate" />
+		<result property="endTime" column="end_time" />
+		<result property="status" column="Status" />
+		<result property="companyId" column="companyId" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="type" column="Type" />
+	</resultMap>
+
+
+
+
+
+	<select id="loginUserServer" parameterClass="Personnel"
+		resultMap="PersonnelRes">
+		select * from Personnel where UserName=#userName# and
+		Pwd=#pwd# and delete_flag=1
+	</select>
+
+	<insert id="addUserdaily" parameterClass="java.util.HashMap">
+		INSERT INTO tb_user_daily(user_id,create_time) values(#userId#,(select
+		getDate()))
+		<selectKey keyProperty="userDailyId" resultClass="long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<select id="finduserDailyList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by create_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from (
+		select *
+		from tb_user_daily d,Personnel p where d.user_id=p.ID ) s
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="likeName">
+				(s.Name like
+				'%'+#likeName#+'%' or s.UserName like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				s.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ s.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by create_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+	<select id="finduserDailyListCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from ( select * from tb_user_daily d,Personnel p where
+		d.user_id=p.ID ) s
+		<dynamic prepend="where">
+			<isNotEmpty prepend="AND" property="likeName">
+				(s.Name like
+				'%'+#likeName#+'%' or s.UserName like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				s.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ s.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<!-- 查找账号列表和数量 -->
+	<select id="findPersonnelList1" parameterClass="java.util.HashMap"
+		resultMap="PersonnelRes">
+		select top $size$ * from (select row_number()over(order by
+		id
+		desc)rowId ,*
+		from (select top ($startIndex$+$size$) * from Personnel
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="type">
+				(Type=#type#) and
+				delete_flag=1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyId">
+				(companyId=
+				#companyId#) and delete_flag=1
+			</isNotEmpty>
+		</dynamic>
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%$name$%')
+		</isNotEmpty>
+		order by id desc)ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<select id="findPersonnelListCount1" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from Personnel
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="type">
+				(Type=#type#) and
+				delete_flag=1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyId">
+				(companyId=
+				#companyId#) and delete_flag=1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 新建账号 -->
+	<insert id="newPersonnelInfo" parameterClass="java.util.HashMap">
+		INSERT INTO Personnel(
+		<isNotEmpty property="deleteFlag">
+			delete_flag
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			Name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userName">
+			UserName
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pwd">
+			Pwd
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			Email
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			Phone
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="type">
+			Type
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			Status
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="organizationalID">
+			OrganizationalID
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="gender">
+			Gender
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createdDate">
+			CreatedDate
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			companyId
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="endTime">
+			end_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="cardNo">
+			CardNo
+		</isNotEmpty>
+		)
+		VALUES(
+		<isNotEmpty property="deleteFlag">
+			#deleteFlag#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userName">
+			#userName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pwd">
+			#pwd#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			#email#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			#phone#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="type">
+			#type#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="organizationalID">
+			#organizationalID#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="gender">
+			#gender#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createdDate">
+			#createdDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="endTime">
+			#endTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="cardNo">
+			#cardNo#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="id" resultClass="long" type="post">
+			select
+			@@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!-- 删除账号 -->
+	<update id="delPersonnelInfo" parameterClass="java.util.HashMap">
+		UPDATE Personnel
+		SET delete_flag = 2 WHERE ID=#id#
+	</update>
+	<!-- 查询账号信息 -->
+	<select id="findPersonnelInfo" parameterClass="Long"
+		resultClass="Personnel">
+		select
+		Name,UserName,Pwd,Email,Phone,Type,Status,OrganizationalID,Gender,CardNo
+		,CreatedDate,delete_flag,companyId,end_time
+		from Personnel where
+		ID=#id#
+	</select>
+	<!--更改账号信息 -->
+	<update id="updatePersonnelInfo" parameterClass="java.util.HashMap">
+		UPDATE Personnel
+		SET
+		<isNotEmpty property="deleteFlag">
+			delete_flag=1
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			Name=#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userName">
+			UserName=#userName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="pwd">
+			Pwd=#pwd#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="email">
+			Email=#email#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			Phone=#phone#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="type">
+			Type=#type#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			Status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="gender">
+			Gender=#gender#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="organizationalID">
+			OrganizationalID=#organizationalID#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createdDate">
+			CreatedDate=#createdDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			companyId=#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="endTime">
+			end_time=#endTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="cardNo">
+			CardNo=#cardNo#
+		</isNotEmpty>
+		WHERE ID = #id#
+	</update>
+
+	<!-- 企业下人员删除 -->
+	<update id="deleteCompanyPersonnel" parameterClass="java.util.HashMap">
+		UPDATE
+		Personnel SET delete_flag =2 WHERE companyId =#companyId#
+	</update>
+
+	<!-- 查看账号是否重复 -->
+	<select id="checkName" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select COUNT(*) from Personnel where UserName =#name#
+	</select>
+	<!-- <select id="findpersonnelInfo1" parameterClass="Long" resultMap="PersonnelRes"> 
+		select * from Personnel where ID=#personnelId# </select> -->
+
+	<!-- 最后登陆时间 -->
+	<update id="updateEventualLoginTime" parameterClass="Long">
+		update
+		Personnel set end_time=GETDATE() where ID=#Id# and delete_flag=1
+	</update>
+
+	<select id="selectRolePernel" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from Action
+		<dynamic prepend="where">
+			<isEqual prepend="AND" property="type" compareValue="1">
+				ID like
+				'c%'
+			</isEqual>
+			<isEqual prepend="AND" property="type" compareValue="0">
+				ID like
+				'y%'
+			</isEqual>
+			<isNotEmpty prepend="AND" property="ParentID">
+				ParentID=#ParentID#
+			</isNotEmpty>
+			<isEmpty prepend="AND" property="ParentID">
+				ParentID is null
+			</isEmpty>
+		</dynamic>
+	</select>
+
+	<select id="queryRolePernel" parameterClass="Long" resultClass="String">
+		select ActionID from Role_Action where RoleID in( select ID from Role
+		where ID in( select RoleID from Personnel_Role where
+		PersonnelID=#value#))
+	</select>
+	<select id="queryPernelActions" parameterClass="Long"
+		resultClass="String">
+		select ActionID from Personnel_Actions where
+		PersonnelID=#value#
+	</select>
+	<select id="selRolePernelMger" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select * from Role where ID in(select RoleID from
+		Personnel_Role where
+		PersonnelID=#value#)
+	</select>
+	<select id="selCompanyRole" parameterClass="String" resultClass="java.util.HashMap">
+		select * from Role where Category=#value#
+	</select>
+	<select id="selecRoleActions" parameterClass="Long" resultClass="String">
+		select ActionID from Role_Action where RoleID=#value#
+	</select>
+	<delete id="detRolePernel" parameterClass="Long">
+		delete from
+		Personnel_Role where PersonnelID=#value#
+	</delete>
+	<insert id="addRolePernel" parameterClass="java.util.HashMap">
+		insert into
+		Personnel_Role(PersonnelID,RoleID,Status,CreatedDate) values
+		(#personnelId#, #roleId#, 1, GETDATE())
+	</insert>
+	<delete id="detActionsPernel" parameterClass="Long">
+		delete from
+		Personnel_Actions where PersonnelID=#value#
+	</delete>
+	<insert id="addActionPernel" parameterClass="java.util.HashMap">
+		insert into
+		Personnel_Actions(PersonnelID,ActionID,Status,CreatedDate) values
+		(#personnelId#, #actionId#, 1, GETDATE())
+	</insert>
+	<insert id="addRolePersonnel" parameterClass="java.util.HashMap">
+		insert into
+		Role(RoleName,Category,CreatedDate,Status)
+		values(#name#,#Category#,GETDATE(),1)
+		<selectKey keyProperty="ID" resultClass="long" type="post">
+			select
+			@@IDENTITY as value
+		</selectKey>
+	</insert>
+	<insert id="addRoleAction" parameterClass="java.util.HashMap">
+		insert into
+		Role_Action(RoleID,ActionID,CreatedDate)
+		values(#roleId#,#actionId#,GETDATE())
+	</insert>
+
+	<update id="updRoleActionsName" parameterClass="java.util.HashMap">
+		update Role set RoleName=#name# where ID=#RoleID#
+	</update>
+
+	<delete id="detRoleActions" parameterClass="Integer">
+		delete from
+		Role_Action where RoleID=#value#
+	</delete>
+	<select id="checkPersonnelName" parameterClass="String" resultClass="Integer">
+	 select COUNT(*) from Personnel where UserName=#value#
+	</select>
+	
+
+</sqlMap>

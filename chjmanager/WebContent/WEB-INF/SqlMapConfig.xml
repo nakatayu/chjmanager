@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>    
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<sqlMap resource="com/chj/entity/User.xml" />
+	<sqlMap resource="com/chj/entity/Company.xml" />
+	<sqlMap resource="com/chj/entity/CompanyShop.xml" />
+	<sqlMap resource="com/chj/entity/CompanyTag.xml" />
+	<sqlMap resource="com/chj/entity/CompanyTagRecord.xml" />
+	<sqlMap resource="com/chj/entity/Producttag.xml" />
+	<sqlMap resource="com/chj/entity/Tag.xml" />
+	<sqlMap resource="com/chj/entity/Shop.xml" />
+	<sqlMap resource="com/chj/entity/Category.xml" />
+	<sqlMap resource="com/chj/entity/Area.xml" />
+	<sqlMap resource="com/chj/entity/Shoptag.xml" />
+	<sqlMap resource="com/chj/entity/Shoparea.xml" />
+	<sqlMap resource="com/chj/entity/Product.xml" />
+	<sqlMap resource="com/chj/entity/Productshopcategory.xml" />
+	<sqlMap resource="com/chj/entity/OptionalProductCategory.xml" />
+	<sqlMap resource="com/chj/entity/ShopProduct.xml" />
+	<sqlMap resource="com/chj/entity/ProductAttribute.xml" />
+	<sqlMap resource="com/chj/entity/Addproductattribute.xml" />
+	<sqlMap resource="com/chj/entity/Order.xml" />
+	<sqlMap resource="com/chj/entity/OrderItem.xml" />
+	<sqlMap resource="com/chj/entity/Circle.xml" />
+	<sqlMap resource="com/chj/entity/Activity.xml" />
+	<sqlMap resource="com/chj/entity/Topic.xml" />
+	<sqlMap resource="com/chj/entity/Servicelist.xml" />
+	<sqlMap resource="com/chj/entity/Advertisement.xml" />
+	<sqlMap resource="com/chj/entity/CircleTag.xml" />
+	<sqlMap resource="com/chj/entity/Push.xml" />
+	<sqlMap resource="com/chj/entity/ServiceTag.xml" />
+	<sqlMap resource="com/chj/entity/SetHotAmount.xml" />
+	<sqlMap resource="com/chj/entity/Personnel.xml" />
+	<sqlMap resource="com/chj/entity/ServiceArea.xml" />
+</sqlMapConfig>   

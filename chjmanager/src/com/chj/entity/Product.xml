@@ -1,0 +1,755 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Product">
+	<typeAlias alias="Product" type="com.chj.entity.Product" />
+
+	<resultMap class="Product" id="ProductRes">
+		<result property="productId" column="product_id" />
+		<result property="productCategoryId" column="product_category_id" />
+		<result property="name" column="name" />
+		<result property="brand" column="brand" />
+		<result property="factory" column="factory" />
+		<result property="place" column="place" />
+		<result property="feature" column="feature" />
+		<result property="summary" column="summary" />
+		<result property="createTime" column="create_time" />
+		<result property="createUserId" column="create_user_id" />
+		<result property="content" column="content" jdbcType="NText" />
+		<result property="lastEditUserId" column="last_edit_user_id" />
+		<result property="companyId" column="company_id" />
+		<result property="shareCount" column="share_count" />
+		<result property="starScore" column="star_score" />
+		<result property="companyShopProductId" column="company_shop_product_id" />
+		<result property="productNumber" column="product_number" />
+		<result property="companyId" column="company_id" />
+		<result property="categoryName" column="category_name" />
+	</resultMap>
+
+	<update id="updateProductSkuPrice" parameterClass="java.util.HashMap">
+		update
+		tb_product_sku set price=#price#,old_price=#oldPrice# where
+		product_sku_id=#skuId#
+	</update>
+	<!-- 保存商品信息 -->
+	<insert id="saveProductInfo" parameterClass="Product">
+		INSERT INTO TB_PRODUCT(
+		<isNotEmpty property="name">
+			name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productCategoryId">
+			product_category_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productNumber">
+			product_number
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="brand">
+			brand
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="factory">
+			factory
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="place">
+			place
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="feature">
+			feature
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="summary">
+			summary
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createTime">
+			create_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createUserId">
+			create_user_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lastEditUserId">
+			last_edit_user_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shareCount">
+			share_count
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="starScore">
+			star_score
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="startTime">
+			start_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="endTime">
+			end_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="invoice">
+			invoice
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="afterRepair">
+			after_repair
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="timeType">
+			time_type
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyShopId">
+			company_shop_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="foreignName">
+			foreign_name
+		</isNotEmpty>
+		,delete_flag)
+		VALUES(
+		<isNotEmpty property="name">
+			#name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productCategoryId">
+			#productCategoryId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productNumber">
+			#productNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="brand">
+			#brand#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="factory">
+			#factory#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="place">
+			#place#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="feature">
+			#feature#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="summary">
+			#summary#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createTime">
+			#createTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="createUserId">
+			#createUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lastEditUserId">
+			#lastEditUserId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="shareCount">
+			#shareCount#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="starScore">
+			#starScore#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="startTime">
+			#startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="endTime">
+			#endTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="invoice">
+			#invoice#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="afterRepair">
+			#afterRepair#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="timeType">
+			#timeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyShopId">
+			#companyShopId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="foreignName">
+			#foreignName#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="productId" resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--开发区 企业进入商品列表显示 -->
+	<select id="findproductList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		product_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_product p
+		WHERE delete_flag!=2
+		<isNotEmpty prepend="AND" property="companyId">
+			(company_id=#companyId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="companyName">
+			exists(select * from
+			tb_company c where c.company_id=p.company_id and c.name like
+			'%'+#companyName#+'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%'+#name#+'%')
+		</isNotEmpty>
+		order by product_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!--开发区 店铺进入商品列表显示 -->
+	<select id="findShopProductList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		company_id
+		desc)rowId,* from (select top ($startIndex$+$size$)
+		p.product_id,
+		p.name, p.company_id, p.place, p.summary, p.content,
+		p.brand,
+		p.browse_count, p.product_number, p.product_category_id,
+		p.star_score,
+		csp.company_shop_product_id,
+		csp.company_shop_id,
+		csp.function_type,
+		csp.order_field_function,
+		csp.order_field_category,
+		csp.first_extend,
+		csp.relation_phone_extend,
+		csp.first_phone_extend from
+		tb_product p
+		inner join
+		tb_company_shop_product csp on
+		p.product_id=csp.product_id
+		where p.delete_flag!=2 and
+		csp.delete_flag!=2 and exists(select
+		u.company_shop_product_id from
+		tb_company_shop_product_sku u where
+		u.company_shop_product_id=csp.company_shop_product_id and
+		u.delete_flag!=2)
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyShopId">
+				csp.company_shop_id=#companyShopId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				p.name like '%'+#name#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyName">
+				exists(select * from
+				tb_company c where c.company_id=p.company_id and c.name like
+				'%'+#companyName#+'%')
+			</isNotEmpty>
+			<isNotEmpty>
+				<isEqual compareValue="1" prepend="AND" property="extend">
+					(csp.order_field_function>0 or csp.order_field_category>0 or
+					csp.first_extend>0 or csp.relation_phone_extend>0 or
+					csp.first_phone_extend>0)
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+		order by company_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!--开发区 店铺商品分页 -->
+	<select id="findShopProductListCount" resultClass="Long"
+		parameterClass="java.util.HashMap">
+		select COUNT(*) from tb_product p inner join tb_company_shop_product
+		csp on p.product_id=csp.product_id where p.delete_flag!=2 and
+		csp.delete_flag!=2 and exists(select
+		u.company_shop_product_id from
+		tb_company_shop_product_sku u where
+		u.company_shop_product_id=csp.company_shop_product_id
+		and
+		u.delete_flag!=2)
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyShopId">
+				csp.company_shop_id=#companyShopId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				p.name like '%'+#name#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="companyName">
+				exists(select * from
+				tb_company c where c.company_id=p.company_id and c.name like
+				'%'+#companyName#+'%')
+			</isNotEmpty>
+			<isNotEmpty>
+				<isEqual compareValue="1" prepend="AND" property="extend">
+					(csp.order_field_function>0 or csp.order_field_category>0 or
+					csp.first_extend>0 or csp.relation_phone_extend>0 or
+					csp.first_phone_extend>0)
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<!-- 删除商品信息 -->
+	<!-- <delete id="deleteProduct" parameterClass="java.util.HashMap"> delete 
+		from tb_product where product_id=#shopId# </delete> -->
+
+	<!--开发区 企业商品分页 -->
+	<select id="queryProductCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_product p where delete_flag=1
+		<isNotEmpty prepend="AND" property="companyId">
+			(company_id=#companyId#)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="companyName">
+			exists(select * from
+			tb_company c where c.company_id=p.company_id and c.name like
+			'%'+#companyName#+'%')
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%'+#name#+'%')
+		</isNotEmpty>
+	</select>
+
+	<!-- 查找商品信息 -->
+	<select id="findProductInfo" parameterClass="Object"
+		resultClass="java.util.HashMap">
+		select
+		product_id,s.product_category_id,s.name,brand,factory,place,feature,
+		summary,s.create_time
+		,create_user_id,last_edit_user_id,content,share_count,star_score,company_id,
+		start_time,end_time,invoice,after_repair,time_type,pc.name
+		'category_name'
+		from tb_product s left join tb_product_category pc on
+		s.product_category_id=pc.product_category_id where
+		product_id=#productId#
+	</select>
+
+	<!-- 查找商品图片 -->
+	<select id="findPictureInfo" parameterClass="Object"
+		resultClass="java.util.HashMap">
+		select product_image_id,file_path from
+		dbo.tb_product_image where
+		product_id=#productId#
+	</select>
+
+
+
+	<!-- 更新商品信息 -->
+	<update id="updateProductInfo" parameterClass="Product">
+		update tb_company_shop set
+		<isNotEmpty property="shopNumber">
+			shop_number = #shopNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id =#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="name">
+			name = #name#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="address">
+			address=#address#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverOk">
+			deliver_ok=#deliverOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="terminalOk">
+			terminal_ok=#terminalOk#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkmanTel">
+			linkman_tel=#linkmanTel#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="linkman">
+			linkman=#linkman#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendPrice">
+			send_price=#sendPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="deliverMoney">
+			deliver_money=#deliverMoney#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="sendTime">
+			send_time=#sendTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="payType">
+			pay_type=#payType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="categoryId">
+			category_id=#categoryId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lat">
+			lat=#lat#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="lng">
+			lng=#lng#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="logo">
+			logo=#logo#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content=#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceTime">
+			service_time=#serviceTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="areaId">
+			area_id=#areaId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="workTime">
+			work_time=#workTime#
+		</isNotEmpty>
+		where company_shop_id=#companyShopId#
+	</update>
+
+	<!-- 所属店铺 -->
+	<select id="queryProductBelongShop" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select company_shop_id,name from dbo.tb_company_shop s
+		where
+		s.company_id=#companyId#
+	</select>
+
+	<!-- 商品图片保存 -->
+	<insert id="saveProductPicture" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_image (
+		<isNotEmpty property="productId">
+			product_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="filePath">
+			file_path
+		</isNotEmpty>
+		) VALUES(
+		<isNotEmpty property="productId">
+			#productId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="filePath">
+			#filePath#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="productImageId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--自动生成编号 -->
+	<select id="generateProductCode" parameterClass="Long"
+		resultClass="Integer">
+		select count(*) from tb_product p where	p.company_id=#value#
+	</select>
+
+	<!-- 商品口味 -->
+	<select id="findAppend" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select a.append_id,a.name,a.parent_id,p.append_id pappend
+		from tb_append a left join(select append_id from tb_product_append
+		where product_id=#productId# and delete_flag!=2) p on
+		a.append_id=p.append_id
+		where a.delete_flag!=2 and a.company_id=#companyId#
+	</select>
+
+	<!-- 口味保存 -->
+	<insert id="insertAppend" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_append (
+		<isNotEmpty property="productId">
+			product_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="appendId">
+			append_id
+		</isNotEmpty>
+		) VALUES(
+		<isNotEmpty property="productId">
+			#productId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="appendId">
+			#appendId#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="productAppendId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!-- 商品属性保存 -->
+	<insert id="insertAttribute" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_attribute (
+		<isNotEmpty property="attriBute">
+			name
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productId">
+			product_id
+		</isNotEmpty>
+		,delete_flag) VALUES(
+		<isNotEmpty property="attriBute">
+			#attriBute#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="productId">
+			#productId#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="productAttributeId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--商品属性值保存 -->
+	<insert id="insertValue" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_attribute_value (
+		<isNotEmpty property="attrFirstId">
+			product_attribute_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="attributeValue">
+			name
+		</isNotEmpty>
+		,delete_flag) VALUES(
+		<isNotEmpty property="attrFirstId">
+			#attrFirstId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="attributeValue">
+			#attributeValue#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="productAttributeValueId"
+			resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!--商品价格 -->
+	<insert id="insertProductSku" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_sku (status,sku_kind
+		<isNotEmpty prepend="," property="productId">
+			product_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="price">
+			price
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="oldPrice">
+			old_price
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="skuNo">
+			sku_no
+		</isNotEmpty>
+		,delete_flag) VALUES(#status#,#skuKind#
+		<isNotEmpty prepend="," property="productId">
+			#productId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="price">
+			#price#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="oldPrice">
+			#oldPrice#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="skuNo">
+			#skuNo#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="productSkuId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+
+
+	<!--保存属性值和sku的关联关系 -->
+	<insert id="insertProductAttributeValueSku" parameterClass="java.util.HashMap">
+		INSERT INTO tb_product_attribute_value_sku (
+		<isNotEmpty property="skuId">
+			product_sku_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="attrValueId">
+			product_attribute_value_id
+		</isNotEmpty>
+		,delete_flag) VALUES(
+		<isNotEmpty property="skuId">
+			#skuId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="attrValueId">
+			#attrValueId#
+		</isNotEmpty>
+		,1)
+	</insert>
+
+	<!--保存 店铺和商品的关系 tb_company_shop_product -->
+	<insert id="insertCompanyShopProduct" parameterClass="java.util.HashMap">
+		INSERT INTO tb_company_shop_product (
+		<isNotEmpty property="companyShopId">
+			company_shop_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyinfo">
+			product_id
+		</isNotEmpty>
+		,delete_flag) VALUES(
+		<isNotEmpty property="companyShopId">
+			#companyShopId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyinfo">
+			#companyinfo#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="companyShopProductId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+
+	<!--保存店铺SKU tb_company_shop_product_sku -->
+	<insert id="insertCompanyShopProductSku" parameterClass="java.util.HashMap">
+		INSERT INTO tb_company_shop_product_sku (
+		<isNotEmpty property="companyShopProductId">
+			company_shop_product_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="skuId">
+			product_sku_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="stock">
+			stock
+		</isNotEmpty>
+		,delete_flag) VALUES(
+		<isNotEmpty property="companyShopProductId">
+			#companyShopProductId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="skuId">
+			#skuId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="stock">
+			#stock#
+		</isNotEmpty>
+		,1)
+		<selectKey keyProperty="companyShopProductSkuId"
+			resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<update id="updateTheProductInfo" parameterClass="java.util.HashMap">
+		update tb_product
+		<dynamic prepend="set">
+			<isNotEmpty prepend=",">name=#name#</isNotEmpty>
+			<isNotEmpty prepend=",">brand=#brand#</isNotEmpty>
+			<isNotEmpty prepend=",">factory=#factory#</isNotEmpty>
+			<isNotEmpty prepend=",">place=#place#</isNotEmpty>
+			<isNotEmpty prepend=",">feature=#feature#</isNotEmpty>
+			<isNotEmpty prepend=",">content=#content#</isNotEmpty>
+			<isNotEmpty prepend=",">summary=#summary#</isNotEmpty>
+			<isNotEmpty prepend=",">invoice=#invoice#</isNotEmpty>
+			<isNotEmpty prepend=",">after_repair=#afterRepair#
+			</isNotEmpty>
+			<isNotEmpty prepend=",">product_category_id=#categoryId#
+			</isNotEmpty>
+		</dynamic>
+		where product_id=#productId#
+	</update>
+	<select id="findProductImages" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select * from tb_product_image where
+		product_id=#productId#
+	</select>
+	<select id="findProductSkus" parameterClass="Long" resultClass="java.util.HashMap">
+		select * from tb_product_sku where product_id=#productId# and
+		delete_flag=1
+	</select>
+	<delete id="deleteTheProductImages" parameterClass="Long">
+		delete from
+		tb_product_image where product_id=#productId#
+	</delete>
+	<update id="updateProSkuType" parameterClass="Long">
+		update
+		tb_product_sku set delete_flag=2 where product_sku_id=#value#
+	</update>
+	<select id="productCommeCont" parameterClass="long" resultClass="long">
+		select count(*) from tb_product_comment where delete_flag!=2 and
+		product_id=#productId#
+	</select>
+
+	<!-- 企业下删除商品信息 -->
+	<update id="deleteCompanyShopProduct" parameterClass="java.util.HashMap">
+		UPDATE
+		tb_product SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+
+	<select id="findProduCommst" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by comment_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from
+		tb_product_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="productId">
+				t.product_id=#productId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by comment_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+	<select id="findProduCommstCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_product_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="productId">
+				t.product_id=#productId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<select id="findWebExtendCount" resultClass="Integer"
+		parameterClass="java.util.HashMap">
+		select count(*) from
+		tb_company_shop_product t where
+		delete_flag!=2 and
+		$filName$>0
+		<isNotEmpty prepend="AND" property="functionType">
+			function_type=#functionType#
+		</isNotEmpty>
+		and exists(select
+		u.company_shop_product_id from
+		tb_company_shop_product_sku u where
+		u.company_shop_product_id=t.company_shop_product_id
+		and
+		u.delete_flag!=2)
+	</select>
+	<update id="companyShopProductWebExtend" parameterClass="java.util.HashMap">
+		update
+		tb_company_shop_product set $filName$=#filValue#
+		where
+		company_shop_product_id=#companyShopProductId#
+		<isNotEmpty prepend="AND" property="functionType">
+			function_type=#functionType#
+		</isNotEmpty>
+	</update>
+	<update id="updtProductCommentl" parameterClass="java.util.HashMap">
+		update
+		tb_product_comment set delete_flag=2 where
+		product_comment_id=#comId#
+		and product_id=#productId#
+	</update>
+	<update id="updadelAppend" parameterClass="Long">
+		update
+		tb_product_append set delete_flag=2 where product_id=#value#
+	</update>
+	<select id="findSKUnumber" parameterClass="Long" resultClass="Integer">
+		select COUNT(*) from tb_product_sku where product_id=#value#
+	</select>
+
+</sqlMap>
+
+

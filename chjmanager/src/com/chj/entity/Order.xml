@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    <sqlMap namespace="Order">
+    <typeAlias alias="Order" type="com.chj.entity.Order"/>
+    <resultMap class="Order" id="OrderRes">
+    <result property="orderId" column="order_id"/>
+     <result property="flowNo" column="flow_no"/>
+     <result property="payType" column="pay_type"/>
+     <result property="userId" column="user_id"/>
+     <result property="orderTime" column="order_time"/>
+     <result property="status" column="status"/>
+     <result property="money" column="money"/>
+     <result property="shopId" column="shop_id"/>
+     <result property="name" column="name"/>
+      <result property="address" column="address"/>
+     <result property="phone" column="phone"/>
+     <result property="sendType" column="send_type" />
+     <result property="sendCost" column="send_cost"/>
+      <result property="serviceCost" column="service_cost"/>
+     <result property="total" column="total"/>
+     <result property="sendDate" column="send_date"/>
+     <result property="info" column="info"/>
+     <result property="payStatus" column="pay_status"/>
+     <result property="invoiceType" column="invoice_type" />
+     <result property="invoiceTitle" column="invoice_title"/>
+     <result property="invoiceClass" column="invoice_class" />
+     
+     <result property="shopName" column="shop_id"  select="selectOrderShopName"/>
+    </resultMap>
+    
+    <select id="selectOrderShopName" parameterClass="Long" resultClass="String">
+     select name from tb_company_shop where company_shop_id=#value#
+    </select>
+    
+  <!-- 店铺权限进入  查看订单列表 --> 
+    <select id="findShopOrderList"  resultMap="OrderRes" parameterClass="java.util.HashMap">
+select top $size$ * from (select row_number()over(order by order_id desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_order s
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="companyShopId"> 
+				 s.shop_id =#companyShopId#
+				</isNotEmpty>
+				 <isNotEmpty prepend="AND" property="status"> 
+				(status= #status#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="Unfinish"> 
+				(status != 5 ) and  status!=6
+				</isNotEmpty>
+		</dynamic>		
+		 order by order_id desc) ss
+		 ) sss
+where sss.rowId>$startIndex$
+	</select>  
+<!-- 店铺权限进入 计算订单数量 -->	
+ <select id="findShopOrderListCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+	select COUNT(*) from tb_order 
+	<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="companyShopId"> 
+				shop_id = #companyShopId#
+				</isNotEmpty>
+				 <isNotEmpty prepend="AND" property="status"> 
+				(status= #status#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="Unfinish"> 
+				(status != 5 ) and  status!=6
+				</isNotEmpty>
+		</dynamic>	
+ </select>    
+ 
+ 
+  <!-- 订单列表显示 -->
+<select id="findOrderList"  resultMap="OrderRes" parameterClass="java.util.HashMap">
+select top $size$ * from (select row_number()over(order by order_id desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_order s
+		<dynamic prepend="WHERE">
+			  <isNotEmpty prepend="AND" property="companyId"> 
+				exists(select t.company_shop_id from tb_company_shop t where 
+ t.company_shop_id=s.shop_id and t.company_id=#companyId#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="companyShopId"> <!--开发区权限  企业店铺订单列表  -->
+				exists(select t.company_shop_id from tb_company_shop t where 
+ t.company_shop_id=s.shop_id and t.company_shop_id=#companyShopId#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="name">
+				(CONVERT(varchar,order_time,120)LIKE '%$name$%')
+			</isNotEmpty>
+				<isNotEmpty prepend="AND" property="shopId">
+				 s.shop_id =#shopId#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="status"> 
+				(status= #status#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="Unfinish"> 
+				(status != 5 ) and  status!=6
+				</isNotEmpty>
+		</dynamic>
+		 order by order_id desc) ss
+		 ) sss
+where sss.rowId>$startIndex$
+	</select>  
+	
+ <!-- 订单列表分页 -->
+   <select id="findOrderListCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+			select count(*) from tb_order s
+		<dynamic prepend="WHERE">
+			  <isNotEmpty prepend="AND" property="companyId"> 
+				exists(select t.company_shop_id from tb_company_shop t where 
+ t.company_shop_id=s.shop_id and t.company_id=#companyId#)
+				</isNotEmpty>
+					<isNotEmpty prepend="AND" property="companyShopId"> <!--开发区权限  企业店铺订单列表  -->
+				exists(select t.company_shop_id from tb_company_shop t where 
+ t.company_shop_id=s.shop_id and t.company_shop_id=#companyShopId#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="shopId">
+				 s.shop_id =#shopId#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="status"> 
+				(status= #status#)
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="Unfinish"> 
+				(status != 5 ) and status!=6
+				</isNotEmpty>
+		</dynamic>
+	</select>
+    
+    
+   <!--订单付款状态更改  -->
+ <update id="updateOrderPayStatus"  parameterClass="java.util.HashMap" >
+    update tb_order set pay_status = #payStatus#  where order_id=#orderId#
+    </update> 
+<!--  订单付款状态更改后insert  tb_order_flow  -->
+	<insert id="insertOrderPayStatusAfter" parameterClass="java.util.HashMap">
+	INSERT INTO tb_order_flow(order_id,user_id,name,status_value,create_date)
+		VALUES(#orderId#,#userId#,#userName#,#statusValue#,GETDATE())
+	</insert>	
+    
+       <!--订单状态更改  -->
+ <update id="updateOrderStatus"  parameterClass="java.util.HashMap"  >
+    update tb_order set status=#status#  where order_id=#orderId#
+    </update> 
+    <!--  订单状态更改后insert  tb_order_flow  -->
+	<insert id="insertOrderStatusAfter" parameterClass="java.util.HashMap">
+	INSERT INTO tb_order_flow(order_id,user_id,name,status_value,create_date)
+		VALUES(#orderId#,#userId#,#userName#,#statusValue#,GETDATE())
+	</insert>	
+	
+	  <!-- 查找订单信息 -->   
+     <select id="findOrderInfo" parameterClass="Object" resultClass="java.util.HashMap">
+     select c.company_id,o.flow_no,cs.name shopName,o.order_id,o.order_time,o.send_type,o.money,o.name,o.phone,o.address,o.pay_type,o.status,o.pay_status,o.invoice_title,o.invoice_type,o.invoice_class
+  from tb_company c left join tb_company_shop cs on c.company_id=cs.company_id left join tb_order o on o.shop_id= cs.company_shop_id
+  where o.order_id=#orderId#
+     </select>
+ <!-- 查看订单状态是否是 接受 -->       
+    <select id="findOrderStatusAccept"  parameterClass="java.util.HashMap"  resultClass="String">
+		select status from tb_order where order_id=#orderId#
+     </select>
+<!-- 查看当前状态是否是5已完成或者6已取消 -->
+<select id="findCheckStatus" parameterClass="java.util.HashMap" resultClass="Long">
+  	 select status from tb_order where order_id=#orderId#
+ </select> 
+ 
+ 
+
+
+ 
+</sqlMap>    

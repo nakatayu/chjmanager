@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Category">
+	<typeAlias alias="Category" type="com.chj.entity.Category" />
+	<resultMap class="Category" id="CategoryRes">
+		<result property="productCategoryId" column="product_category_id" />
+		<result property="name" column="name" />
+		<result property="parentId" column="parent_id" />
+	</resultMap>
+	<!-- 页面只显示2条分类信息 -->
+	<!-- 公共分类 -->
+	<select id="queryShopstairtagList" resultClass="java.util.HashMap">
+		select
+		product_category_id as productCategoryId,name as Name from
+		tb_product_category Where parent_id =0 and delete_flag=1
+	</select>
+
+	<!-- 分类名称 -->
+	<select id="querysecondtagList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select product_category_id as productCategoryId,name as
+		Name from
+		tb_product_category Where parent_id =#shoptagId# and delete_flag=1
+	</select>
+
+
+	<!-- 删除已选分类 -->
+	<delete id="deleteCategory" parameterClass="java.util.HashMap">
+		delete from
+		tb_company_shop_tag where company_shop_id=#shopId#
+	</delete>
+
+	<select id="theCategoryFullInfo" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select * from tb_product_category where
+		parent_id=#categoryId# and
+		delete_flag=1
+	</select>
+	<select id="theCategoryImageInfo" resultClass="java.util.HashMap"
+		parameterClass="String">
+		select * from tb_product_category where
+		product_category_id=#categoryId#
+	</select>
+	<insert id="pinTheCategory" parameterClass="java.util.HashMap">
+		insert into tb_product_category(name,parent_id,create_time
+		<dynamic prepend="">
+		<isNotEmpty prepend="," property="image">
+		 image
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="color">
+		color
+		</isNotEmpty>
+		</dynamic>
+		)
+		values(#name#,#categoryId#,(select GETDATE())
+		<dynamic prepend="">
+		<isNotEmpty prepend="," property="image">
+		 #image#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="color">
+		#color#
+		</isNotEmpty>
+		</dynamic>
+		 )
+		<selectKey keyProperty="productCategoryId" resultClass="Long"
+			type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<update id="updTheCategoryImage" parameterClass="java.util.HashMap">
+		update
+		tb_product_category set image=#image#,color=#color#,name=#name# where
+		product_category_id=#categoryId#
+	</update>
+	<update id="updTheStatusOfCate" parameterClass="String">
+		update
+		tb_product_category set delete_flag=2 where
+		product_category_id=#categoryId# or
+		parent_id=#categoryId#
+	</update>
+
+	<update id="updTheCateName" parameterClass="java.util.HashMap">
+		update tb_product_category set name=#name# where
+		product_category_id=#categoryId#
+	</update>
+
+</sqlMap>

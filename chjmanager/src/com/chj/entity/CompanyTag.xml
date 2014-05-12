@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="CompanyTag">
+	<typeAlias alias="CompanyTag" type="com.chj.entity.CompanyTag" />
+
+	<resultMap class="CompanyTag" id="CompanyTagRes">
+		<result property="tagId" column="tag_id" />
+		<result property="tagName" column="tag_name" />
+		<result property="createAccount" column="create_acconut" />
+		<result property="createDate" column="create_date" />
+		<result property="clickCount" column="click_count" />
+		<result property="parentId" column="parent_id" />
+		<result property="companyId" column="company_id" />
+		<result property="deleteFlag" column="delete_flag" />
+		<result property="addTime" column="add_time" />
+	</resultMap>
+	<!--开发区  保存企业标签-->
+	<insert id="insertCompanyTag" parameterClass="CompanyTag">
+	INSERT INTO tb_company_tag
+           (company_id
+           ,tag_id
+           ,add_time
+           ,delete_flag)
+     VALUES
+           (#companyId#
+           ,#tagId#
+           ,GETDATE()
+           ,1)
+	</insert>
+<!--开发区  查找企业标签 -->
+<select id="findCompanyTag"  parameterClass="Object"  resultClass="java.util.HashMap">
+     select tag_name,tag.tag_id from tb_company_tag ct left join tb_tag tag on ct.tag_id=tag.tag_id
+where ct.company_id = #companyId#
+</select>
+<!--开发区  删除标签-->
+<delete id="deleteCompanyTag"  parameterClass="java.util.HashMap" >
+   DELETE FROM  tb_company_tag  WHERE company_id = #companyId#
+</delete>
+	<!--开发区  保存企业标签-->
+	<insert id="updateCompanyTag" parameterClass="CompanyTag">
+	INSERT INTO tb_company_tag
+           (company_id
+           ,tag_id
+           ,add_time
+           ,delete_flag)
+     VALUES
+           (#companyId#
+           ,#tagId#
+           ,GETDATE()
+           ,1)
+	</insert>
+	<!-- 标签分类 -->
+	<select id="findTagList" resultClass="java.util.HashMap">
+		select tag_id as
+		tagId,tag_name as tagName from tb_tag Where parent_id
+		=0
+	</select>
+
+	<!-- 标签名称 -->
+	<select id="queryTagNameList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select tag_id as tagId,tag_name as tagName from
+		tb_tag
+		Where parent_id=#tagId#
+	</select>
+
+</sqlMap>

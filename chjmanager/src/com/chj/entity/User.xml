@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="User">
+	<typeAlias alias="User" type="com.chj.entity.User" />
+
+	<resultMap class="User" id="UserRes">
+		<result property="userId" column="user_id" />
+		<result property="nickName" column="nick_name" />
+		<result property="password" column="password" />
+		<result property="phone" column="phone" />
+		<result property="isVerify" column="is_verify" />
+		<result property="email" column="email" />
+		<result property="sex" column="sex" />
+		<result property="lastLoginIp" column="last_login_ip" />
+		<result property="lastLoginTime" column="Last_login_time" />
+		<result property="idCardNo" column="id_card_no" />
+		<result property="idCardType" column="id_card_type" />
+		<result property="headPicture" column="head_picture" />
+		<result property="commpanyId" column="commpany_id" />
+		<result property="lastName" column="last_name" />
+		<result property="firstName" column="first_name" />
+		<result property="constellation" column="constellation" />
+		<result property="blood" column="blood" />
+		<result property="birthDate" column="birth_date" />
+		<result property="lableType" column="lable_type" />
+		<result property="role" column="role" />
+		<result property="account" column="account" />
+		<result property="realName" column="realname" />
+		<result property="shandCardNo" column="shand_cardno" />
+		<result property="registerTime" column="register_time" />
+		<result property="city" column="city" />
+		<result property="workAddress" column="work_address" />
+		<result property="companyName" column="company_name" />
+		<result property="activeValue" column="active_value" />
+		<result property="webUrl" column="my_weburl" />
+		<result property="info" column="info" />
+
+	</resultMap>
+
+	<!-- 根据店铺id获取企业id -->
+	<select id="getCompanyIdNum" parameterClass="Long" resultClass="Long">
+		select company_id as companyId from tb_company_shop Where
+		company_shop_id =#CompanyIdNum#
+	</select>
+
+
+	<select id="selUserCountByUniqueField" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_user Where $uniqueField$ =
+		#fieldValue#
+	</select>
+
+	<select id="selUserByUniqueField" parameterClass="java.util.HashMap"
+		resultMap="UserRes">
+		select * from tb_user Where $uniqueField$ = #fieldValue#
+	</select>
+
+	<select id="selUserByAccountPassword" parameterClass="User"
+		resultMap="UserRes">
+		select * from tb_user Where (phone =#phone# or email=#phone#
+		or
+		nick_name=#phone#) and password=#password#
+	</select>
+	<update id="updateUserInfo" parameterClass="User">
+		update tb_user set
+		first_name=#firstName#, last_name=#lastName#,sex=#sex#,
+		id_card_type =
+		#idCardType#,id_card_no=#idCardNo#,blood=#blood#,
+		birth_date =
+		#birthDate#, constellation=#constellation#
+		where user_id=#userId#
+	</update>
+
+	<update id="updateUserHeadImg" parameterClass="User">
+		update tb_user set
+		head_picture=#headPicture#
+		where user_id=#userId#
+	</update>
+
+	<update id="updateUserPassword" parameterClass="User">
+		update tb_user
+		set password=#password#
+		where user_id=#userId#
+	</update>
+
+	<update id="updateUserLableType" parameterClass="User">
+		update tb_user
+		set lable_type=#lableType#
+		where user_id=#userId#
+	</update>
+
+	<insert id="insertUser" parameterClass="User">
+		INSERT INTO tb_user(phone,email,nick_name,password,is_verify)
+		VALUES(#phone#, #email#,#nickName#,#password#,#isVerify#)
+		<selectKey keyProperty="userId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	<!-- <select id="loginUserServer" parameterClass="User" resultMap="UserRes"> 
+		select * from tb_user where account=#account# and password=#password# </select> -->
+
+	<insert id="insertUserInfo" parameterClass="User">
+		INSERT INTO
+		tb_user(account,role,realname,phone,email)
+		VALUES(#account#,#role#,#realName#,#phone#,#email#)
+		<selectKey keyProperty="userId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	<select id="findTheUsername" parameterClass="Long" resultClass="String">
+		select nick_name nickName from tb_user where user_id=#userId#
+	</select>
+	<select id="verifyTheAccount" parameterClass="String" resultMap="UserRes">
+		select * from tb_user where nick_name=#value# or account=#value#
+	</select>
+	<insert id="addShopUserManagerInfo" parameterClass="java.util.HashMap">
+		insert into tb_user(nick_name,password,account,role,is_verify,phone)
+		values(#account#,#pawd#,#account#,'c2','T',#phone#)
+		<selectKey keyProperty="userId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<select id="findUserList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ user_id,isnull(nick_name,0) as
+		nick_name,isnull(phone,0)
+		as phone,isnull(shand_cardno,0)as
+		shand_cardno,isnull(active_value,0)
+		as
+		active_value,convert(datetime,isnull(register_time,0)) as
+		register_time,isnull(last_login_time,0) as last_login_time
+		from (select
+		row_number()over(order by register_time desc)rowId,*
+		from (select top
+		($startIndex$+ $size$) * from tb_user
+		where delete_flag!= 2
+		$keyword$
+		order by register_time desc) ss
+		) sss
+		where sss.rowId>$startIndex$
+	</select>
+
+
+	<select id="queryUserCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_user where delete_flag!= 2
+		$keyword$
+	</select>
+	<select id="findUserInfo" parameterClass="Long" resultClass="java.util.HashMap">
+		SELECT user_id, isnull(nick_name,'')as nick_name, isnull(phone,'') as
+		phone, isnull(email,'') as email, isnull(sex,'') sex,
+		isnull(id_card_type,'') as id_card_type, isnull(head_picture,'') as
+		head_picture, isnull(last_name,'') last_name, isnull(first_name,'')
+		first_name, convert(date,isnull(birth_date,'')) birth_date,
+		isnull(info,'') as info, isnull(city,'') as city, isnull(my_weburl,'')
+		as my_weburl ,isnull( work_address,'') as work_address,isnull(
+		realname,'')as realname, isnull(company_name,'')as company_name,
+		isnull(shand_cardno,'') as shand_cardno, isnull(active_value,'') as
+		active_value, isnull(sincerity_value,'') as sincerity_value,
+		isnull(register_time,0) as register_time
+		FROM dbo.tb_user where
+		user_id=#value#
+	</select>
+
+	<update id="deleteUserListInfo" parameterClass="java.util.HashMap">
+		DECLARE
+		@return_value int
+
+		EXEC @return_value = [dbo].[spDeleteUser]
+		@userId =
+		#userId#
+
+		SELECT 'Return Value' = @return_value
+	</update>
+
+
+	<!--开发区权限 创建用户信息 -->
+	<!--<insert id="addMemberInfo" parameterClass="User"> -->
+	<!--INSERT INTO tb_user( -->
+	<!--<isNotEmpty property="nickName"> -->
+	<!--nick_name -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="birthDate"> -->
+	<!--birth_date -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="firstName"> -->
+	<!--first_name -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="lastName"> -->
+	<!--last_name -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="realName"> -->
+	<!--realname -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="sex"> -->
+	<!--sex -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="city"> -->
+	<!--city -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="workAddress"> -->
+	<!--work_address -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="shandCardNo"> -->
+	<!--shand_cardno -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="activeValue"> -->
+	<!--active_value -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="sincerityValue"> -->
+	<!--sincerity_value -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="registerTime"> -->
+	<!--register_time -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="phone"> -->
+	<!--phone -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="url"> -->
+	<!--my_weburl -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="info"> -->
+	<!--info -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="headPicture"> -->
+	<!--head_picture -->
+	<!--</isNotEmpty> -->
+	<!--) -->
+	<!--VALUES( -->
+	<!--<isNotEmpty property="nickName"> -->
+	<!--"nickName" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="birthDate"> -->
+	<!--"birthDate" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="firstName"> -->
+	<!--"firstName" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="lastName"> -->
+	<!--"lastName" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="realName"> -->
+	<!--"realName" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="sex"> -->
+	<!--"sex" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="city"> -->
+	<!--"city" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="workAddress"> -->
+	<!--"workAddress" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="shandCardNo"> -->
+	<!--"shandCardNo" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="activeValue"> -->
+	<!--"activeValue" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="sincerityValue"> -->
+	<!--"sincerityValue" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="phone"> -->
+	<!--"phone" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="url"> -->
+	<!--"url" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="info"> -->
+	<!--"info" -->
+	<!--</isNotEmpty> -->
+	<!--<isNotEmpty prepend="," property="headPicture"> -->
+	<!--"headPicture" -->
+	<!--</isNotEmpty> -->
+	<!--) -->
+	<!--<selectKey keyProperty="userId" resultClass="long" type="post"> -->
+	<!--select @@IDENTITY as value -->
+	<!--</selectKey> -->
+	<!--</insert> -->
+
+	<update id="updateMemberInfo" parameterClass="User">
+		update tb_user set
+		nick_name=#nickName#,
+		birth_date=#birthDate#,
+		first_name=#firstName#,
+		last_name=#lastName#,
+		realname=#realName#,
+		sex=#sex#,
+		city=#city#,
+		work_address=#workAddress#,
+		shand_cardno=#shandCardNo#,
+		active_value=#activeValue#,
+		sincerity_value=#sincerityValue#,
+		phone=#phone#,
+		my_weburl=#webUrl#,
+		info=#info#,
+		head_picture=#headPicture#
+		where user_id=#userId#
+	</update>
+
+	<select id="findCredentials" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top 1 * from tb_apply_info where
+		object_id=#activityId#
+		and type=#type# and do_type=#doType# and
+		user_id=#userId#
+	</select>
+	<select id="findUserNickName" resultClass="java.util.HashMap"
+		parameterClass="Long">
+		select nick_name as nickName,head_picture as
+		headPicture from tb_user
+		where user_id=#value#
+	</select>
+	<!-- tb_code -->
+	<select id="selectUserCode" resultClass="long">
+		select MAX(number) from
+		tb_code
+	</select>
+	<insert id="addcodeofregter" parameterClass="java.util.HashMap">
+		insert into
+		tb_code(code,depart,be_used,number,delete_flag)
+		values(#code#,#depart#,#beUsed#,#number#,1)
+	</insert>
+	<select id="finserCodlt" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by code
+		desc)rowId,* from
+		(select top ($startIndex$+$size$) * from
+		tb_code t where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="depart">
+				t.depart like
+				'%'+#depart#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="code">
+				t.code like
+				'%'+#code#+'%'
+			</isNotEmpty>
+		</dynamic>
+		order by code desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+	<select id="finserCodltCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_code t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="depart">
+				t.depart like
+				'%'+#depart#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="code">
+				t.code like
+				'%'+#code#+'%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<update id="delTbCodelst" parameterClass="long">
+		update tb_code set
+		delete_flag=2 where code_id=#value#
+	</update>
+	<select id="findtablesNum" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from $table$ where delete_flag!=2
+		<dynamic>
+			<isNotNull prepend="AND" property="companyExamineResult">
+				$companyExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="shopExamineResult">
+				$shopExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="topicExamineResult">
+				$topicExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="activityExamineResult">
+				$activityExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="circleExamineResult">
+				$circleExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="pushExamineResult">
+				$pushExamineResult$='3'
+			</isNotNull>
+			<isNotNull prepend="AND" property="serviceExamineResult">
+				$serviceExamineResult$='3'
+			</isNotNull>
+		</dynamic>
+	</select>
+
+	<select id="findAppVersionList" resultClass="java.util.HashMap">
+		select type,
+		version_no as versionNo, url, is_update as isUpdate from
+		tb_app_version
+	</select>
+	<update id="updateAppVersion" parameterClass="java.util.HashMap">
+		update tb_app_version set version_no=#version#, url=#appUrl#,
+		is_update=#updtype# where type=#Notype#
+	</update>
+
+
+</sqlMap>

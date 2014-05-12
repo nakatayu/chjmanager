@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ProductSku">
+	<typeAlias alias="ProductSku" type="com.chj.entity.ProductSku" />
+
+	<resultMap class="ProductSku" id="ProductSkuRes">
+		<result property="productSkuId" column="product_sku_id" />
+		<result property="productId" column="product_id" />
+		<result property="skuNo" column="sku_no" />
+		<result property="skuKind" column="sku_kind" />
+		<result property="price" column="price" />
+		<result property="status" column="status" />
+		<result property="oldPrice" column="old_price" />
+		<result property="stock" column="stock" />
+		<result property="companyShopProductSkuId" column="company_shop_product_sku_id" />
+	</resultMap>
+
+	<select id="selSkuByShopProductId" parameterClass="Long"
+		resultMap="ProductSkuRes">
+		select top 1 s.*,t.stock,t.company_shop_product_sku_id from
+		tb_company_shop_product_sku t left join tb_product_sku s
+		on
+		s.product_sku_id=t.product_sku_id where
+		t.company_shop_product_id=#value# order by s.price
+	</select>
+
+	<select id="selProductSkuById" parameterClass="Long" resultMap="ProductSkuRes">
+		select top 1 s.*,t.stock,t.company_shop_product_sku_id from (select *
+		from tb_company_shop_product_sku
+		where
+		company_shop_product_sku_id=#value#) t left join tb_product_sku s
+		on
+		s.product_sku_id=t.product_sku_id
+	</select>
+
+	<select id="findProductSkuById" parameterClass="Long" resultMap="ProductSkuRes">
+		select *, 0 as company_shop_product_sku_id,0 as stock from
+		tb_product_sku where product_sku_id=#value#
+	</select>
+
+	
+</sqlMap>

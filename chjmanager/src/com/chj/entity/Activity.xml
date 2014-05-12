@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Activity">
+	<typeAlias alias="Activity" type="com.chj.entity.Activity" />
+
+	<sql id="activityDataFilter">
+		and delete_flag!=2
+	</sql>
+
+	<!--活动列表显示 -->
+	<select id="findActivityList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		activity_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from tb_activity
+		t
+		WHERE 1=1
+		<include refid="activityDataFilter" />
+
+		<isNotEmpty prepend="AND" property="createUserId">
+			(create_user_id=#createUserId# )
+		</isNotEmpty>
+
+		order by activity_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+
+	<!--活动列表显示 -->
+	<select id="findCActivityList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		activity_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_activity t
+		where 1=1
+		<include refid="activityDataFilter" />
+		order by activity_id desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+
+	<!-- 分页 -->
+	<select id="queryActivityCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_activity WHERE create_user_id=#createUserId#
+		<include refid="activityDataFilter" />
+		<!-- <isNotEmpty prepend="AND" property="createUserId"> (create_user_id=#createUserId# 
+			) </isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%$name$%')
+		</isNotEmpty>
+	</select>
+
+	<!-- 分页 -->
+	<select id="queryCActivityCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_activity where 1=1
+
+		<include refid="activityDataFilter" />
+		<!-- <isNotEmpty prepend="AND" property="delete_flag"> (delete_flag!=2) 
+			</isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="name">
+			(NAME like '%$name$%')
+		</isNotEmpty>
+	</select>
+
+	<!-- 逻辑刪除活动 -->
+	<update id="deleteActivity" parameterClass="java.util.HashMap">
+		update tb_activity
+		set
+		delete_flag=#delete_flag#
+		where activity_id=#activityId#
+	</update>
+	<!--逻辑 刪除活动标签 -->
+	<update id="deleteActivityTag" parameterClass="java.util.HashMap">
+		update
+		tb_activity_tag set
+		delete_flag=#delete_flag#
+		where
+		activity_id=#activityId#
+	</update>
+
+	<!-- 添加活动标签 -->
+	<insert id="insertActivityTag" parameterClass="java.util.HashMap">
+		INSERT INTO
+		tb_activity_tag (tag_id,activity_id,create_time,delete_flag)
+		VALUES(#tag_id#,#activity_id#,#create_time#,#delete_flag#)
+	</insert>
+	<!-- 添加活动信息 -->
+	<insert id="insertActivityInfo" parameterClass="Activity">
+		insert into
+		tb_activity(activity_title,summary,activity_content,address,company_id,create_time,
+		status,join_type,is_check,activity_image,begin_time,is_qrcode,user_max,browse_count,examine_result,
+		is_money,moneynum,pay_type,money_detail,traffic,enroll_begin_time
+		<isNotEmpty property="lat">
+			,lat
+		</isNotEmpty>
+		<isNotEmpty property="lng">
+			,lng
+		</isNotEmpty>
+		<isNotEmpty property="enrollEndTime">
+			,enroll_end_time
+		</isNotEmpty>
+		<isNotEmpty property="endTime">
+			,end_time
+		</isNotEmpty>
+		<isNotEmpty property="circleId">
+			,circle_id
+		</isNotEmpty>
+		)
+		values(#activityTitle#,#summary#,#activityContent#,#address#,#companyId#,#createTime#,#status#,#joinType#,#isCheck#,
+		#activityImage#,#beginTime#,#isQrcode#,#userMax#,0,#examineResult#,
+		#isMoney#,#moneynum#,#payType#,#moneyDetail#,#traffic#,#enrollBeginTime#
+		<isNotEmpty property="lat">
+			,#lat#
+		</isNotEmpty>
+		<isNotEmpty property="lng">
+			,#lng#
+		</isNotEmpty>
+		<isNotEmpty property="enrollEndTime">
+			,#enrollEndTime#
+		</isNotEmpty>
+		<isNotEmpty property="endTime">
+			,#endTime#
+		</isNotEmpty>
+		<isNotEmpty property="circleId">
+			,#circleId#
+		</isNotEmpty>
+		)
+		<selectKey keyProperty="activityId" resultClass="Long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!-- 删除活动标签 -->
+	<delete id="delActivityTag" parameterClass="Long">
+		delete
+		tb_activity_tag where activity_id = #value#
+	</delete>
+	<!-- 更新活动信息 -->
+	<update id="updateActivityInfo" parameterClass="Activity">
+		update tb_activity set
+		status='2',examine_result=3,activity_title=#activityTitle#,summary=#summary#,
+		is_money=#isMoney#,activity_image=#activityImage#,activity_content=#activityContent#,begin_time=#beginTime#,
+		enroll_begin_time=#enrollBeginTime#,address=#address#,traffic=#traffic#,join_type=#joinType#,
+		user_max=#userMax#,is_qrcode=#isQrcode#,
+		is_check=#isCheck#
+		<isNotEmpty property="lat">
+			,lat=#lat#
+		</isNotEmpty>
+		<isNotEmpty property="lng">
+			,lng=#lng#
+		</isNotEmpty>
+		<isNotEmpty property="enrollEndTime">
+			,enroll_end_time=#enrollEndTime#
+		</isNotEmpty>
+		<isNotEmpty property="endTime">
+			,end_time=#endTime#
+		</isNotEmpty>
+		<isEqual property="isMoney" compareValue="T">
+			,pay_type=#payType#,moneynum=#moneynum#,money_detail=#moneyDetail#
+		</isEqual>
+		where activity_id=#activityId#
+	</update>
+
+	<delete id="deleteActivityTags" parameterClass="Long">
+		delete from
+		tb_activity_tag where activity_id=#activityId#
+	</delete>
+
+	<!-- 查询活动人数 -->
+	<select id="findACount" parameterClass="Object" resultClass="Long">
+		select count(*) from tb_activity_user where activity_id=#activityId#
+		and delete_flag!=2
+	</select>
+	<!-- 查询在线活动人数 -->
+	<select id="findACountYS" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_activity_user where
+		activity_id=#activity_id# and
+		is_sign_in=#is_sign_in#
+	</select>
+	<!-- 操作活动 -->
+	<update id="updateAstatus" parameterClass="Activity">
+		update tb_activity set
+		status=#status#
+		where activity_id = #activityId#
+	</update>
+	<!-- 查询活动人数情况 -->
+	<select id="findActivityUserList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by user_id
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_activity_user t where activity_id=#activity_id#
+		<!-- <dynamic prepend="WHERE"> <isNotEmpty prepend="AND" property="activity_id"> 
+			(activity_id=#ActivityId#) </isNotEmpty> </dynamic> -->
+		order by user_id desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+	<!-- 查询活动人数数量 -->
+	<select id="findActivityUserListCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*)from
+		tb_activity_user t where
+		activity_id=#activity_id#
+	</select>
+	<!-- 查询活动人手机 -->
+	<select id="findActivityUserPhone" parameterClass="Object"
+		resultClass="String">
+		select phone from tb_user where user_id=#userId#
+	</select>
+	<!-- 查询活动人姓名 -->
+	<select id="findActivityUserRealname" parameterClass="Object"
+		resultClass="String">
+		select realname from tb_user where user_id=#userId#
+	</select>
+	<!-- 修改驳回状态 -->
+	<update id="updateRejectStatus" parameterClass="Activity">
+		update
+		tb_activity set
+		examine_result=#examineResult#,
+		admin_message=#adminMessage#
+		where activity_id = #activityId#
+	</update>
+	<!-- 修改活动信息 -->
+	<select id="findActivity" parameterClass="Long" resultClass="java.util.HashMap">
+		select * from tb_activity where activity_id = #activityId#
+	</select>
+	<!-- 查询活动标签和活动图片 -->
+	<select id="findActivityTagList" parameterClass="String"
+		resultClass="java.util.HashMap">
+		select a.tag_id as tagId,a.tag_name as tagName from
+		tb_activity_tag t left join
+		tb_tag a on
+		t.tag_id =a.tag_id where
+		activity_id = #activityId#
+	</select>
+	<!-- 添加活动用户 -->
+	<insert id="saveActivityUser" parameterClass="java.util.HashMap">
+		insert into
+		tb_activity_user
+		(user_id,activity_id,status,create_time,delete_flag)
+		values(#user_id#,#activity_id#,#status#,#create_time#,#delete_flag#)
+	</insert>
+
+	<select id="findActiUserList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		examine_result desc, create_time desc)rowId,*
+		from (select top
+		($startIndex$+$size$) * from
+		tb_activity t where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="examineResult">
+				t.examine_result=#examineResult#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.activity_title like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isEqual prepend="AND" property="actAction" compareValue="1">
+				t.begin_time>(select GETDATE())
+			</isEqual>
+			<isEqual prepend="AND" property="actAction" compareValue="2">
+			<![CDATA[ t.begin_time<(select GETDATE()) ]]>
+				AND t.end_time>(select GETDATE())
+			</isEqual>
+			<isEqual prepend="AND" property="actAction" compareValue="3">
+			<![CDATA[ t.end_time<(select GETDATE()) ]]>
+			</isEqual>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.first_phone_extend>0 or t.relation_phone_extend>0 or
+					t.is_extend_index>0 or t.is_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+		order by examine_result desc, create_time desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<select id="findActiUserListCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_activity t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="companyId">
+				t.company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="examineResult">
+				t.examine_result=#examineResult#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				(t.activity_title like
+				'%'+#likeName#+'%' or t.summary like '%'+#likeName#+'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+			<isEqual prepend="AND" property="actAction" compareValue="1">
+				t.begin_time>(select GETDATE())
+			</isEqual>
+			<isEqual prepend="AND" property="actAction" compareValue="2">
+			<![CDATA[ t.begin_time<(select GETDATE()) ]]>
+				AND t.end_time>(select GETDATE())
+			</isEqual>
+			<isEqual prepend="AND" property="actAction" compareValue="3">
+			<![CDATA[ t.end_time<(select GETDATE()) ]]>
+			</isEqual>
+			<isNotNull>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(t.first_phone_extend>0 or t.relation_phone_extend>0 or
+					t.is_extend_index>0 or t.is_extend>0)
+				</isEqual>
+			</isNotNull>
+		</dynamic>
+	</select>
+	<update id="updateActiExamine" parameterClass="java.util.HashMap">
+		update tb_activity
+		set examine_result=#examine# where activity_id=#activityId# and
+		examine_result>=#examine#
+	</update>
+	<select id="findActivityDetail" parameterClass="String"
+		resultClass="java.util.HashMap">
+		select * from tb_activity t where
+		t.activity_id=#activityId#
+	</select>
+	<select id="finfindActiOfUserList" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		create_time
+		desc)rowId,*
+		from (select top ($startIndex$+$size$) * from
+		tb_activity_user t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityId">
+				t.activity_id=#activityId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				t.status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by create_time desc) ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+	<select id="finfindActiOfUserListCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_activity_user t where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityId">
+				t.activity_id=#activityId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="status">
+				t.status=#status#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.create_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.create_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<update id="updatetbUserStatus" parameterClass="java.util.HashMap">
+		update
+		tb_activity_user set status=#status# where user_id=#userId# and
+		activity_id=#activityId#
+	</update>
+	<update id="updActUserflag" parameterClass="java.util.HashMap">
+		update
+		tb_activity_user set status=5,delete_flag=#status# where
+		user_id=#userId# and activity_id=#activityId#
+	</update>
+	<select id="findactivityUserInfo" parameterClass="long"
+		resultClass="java.util.HashMap">
+		select nick_name name,phone,email from tb_user where
+		user_id=#userId#
+	</select>
+
+	<select id="findActivmmenlst" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by comment_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from
+		tb_activity_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityId">
+				t.activity_id=#activityId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by comment_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+
+	<select id="findActivmmenlstCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_activity_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityId">
+				t.activity_id=#activityId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="toUserId">
+				t.to_user_id=#toUserId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<update id="updtActivCommlet" parameterClass="java.util.HashMap">
+		update
+		tb_activity_comment set delete_flag=2 where
+		activity_comment_id=#comId# and activity_id=#activityId#
+	</update>
+
+	<!--企业下活动删除 -->
+	<update id="deleteCompanyActivity" parameterClass="java.util.HashMap">
+		UPDATE
+		tb_activity SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+	<select id="selectActivPict" parameterClass="String"
+		resultClass="java.util.HashMap">
+		select * from tb_activity_photo where
+		activity_id=#activityId# and delete_flag!=2 order by upload_time desc
+	</select>
+	<select id="selectActivPictCount" parameterClass="String"
+		resultClass="Integer">
+		select count(*) from tb_activity_photo where
+		delete_flag!=2 and activity_id=#activityId#
+	</select>
+	<select id="chechThePicture" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select top $size$ * from (select
+		row_number()over(order by
+		upload_time desc)rowId,*
+		from (select top
+		($startIndex$+$size$) * from
+		tb_activity_photo where
+		activity_id=#activityId# and delete_flag!=2
+		order by upload_time desc)
+		ss ) sss where sss.rowId > $startIndex$
+	</select>
+
+	<select id="ActPhotCommlt" parameterClass="java.util.HashMap"
+		resultClass="java.util.HashMap">
+		select * from (select row_number()over(order by comment_time
+		desc)rowId,* from (select top ($startIndex$+$size$) * from
+		tb_activity_photo_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityPhotoId">
+				t.activity_photo_id=#activityPhotoId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+		order by comment_time desc) ss ) sss where sss.rowId > $startIndex$
+	</select>
+
+	<select id="ActPhotCommltCount" parameterClass="java.util.HashMap"
+		resultClass="long">
+		select count(*) from tb_activity_photo_comment t
+		where delete_flag!=2
+		<dynamic prepend="">
+			<isNotEmpty prepend="AND" property="activityPhotoId">
+				t.activity_photo_id=#activityPhotoId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="toUserId">
+				t.to_user_id=#toUserId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="likeName">
+				t.content like
+				'%'+#likeName#+'%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="fontTime">
+				t.comment_time>#fontTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="backTime">
+			<![CDATA[ t.comment_time<#backTime# ]]>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	<update id="updActPhoCommels" parameterClass="java.util.HashMap">
+		update
+		tb_activity_photo_comment set delete_flag=2 where
+		actity_photo_comment_id=#comId# and
+		activity_photo_id=#activityPhotoId#
+	</update>
+	<select id="queryNumberOffilName" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_activity where $filName$>0
+		and
+		delete_flag!=2 and examine_result!=2
+	</select>
+	<update id="updaActivityLtop" parameterClass="java.util.HashMap">
+		update tb_activity
+		set
+		$filName$=#filValue# where activity_id=#activityId#
+	</update>
+</sqlMap>

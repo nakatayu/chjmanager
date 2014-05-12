@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+    <!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Tag">
+	<typeAlias alias="Tag" type="com.chj.entity.Tag" />
+	<resultMap class="Tag" id="TagRes">
+		<result property="tagId" column="tag_id" />
+		<result property="tagName" column="tag_name" />
+		<result property="parentId" column="parent_id" />
+	</resultMap>
+	<!-- 页面显示2条标签数据 -->
+	
+	
+   <!-- 标签一级分类 -->
+	<select id="findTagFirstList" resultClass="java.util.HashMap">
+		select tag_id as
+		tagId,tag_name as tagName from tb_tag Where parent_id =0 and delete_flag !=2
+	</select>
+	
+	
+	<!-- 标签二级分类 -->
+	<select id="queryTagSecondList" resultClass="java.util.HashMap">
+		select tag_id as
+		tagId,tag_name as tagName from tb_tag Where parent_id =#tagId# and delete_flag !=2
+	</select>
+
+
+	<!-- 标签三级名称 -->
+	<select id="queryTagThirdList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select tag_id as tagId,tag_name as tagName from tb_tag
+		Where parent_id=#tagId# and delete_flag !=2
+	</select>
+
+
+	<select id="findAddTagList" parameterClass="long" resultClass="java.util.HashMap">
+		select * from tb_tag where parent_id=#value# and delete_flag=1
+	</select>
+
+	<insert id="addTheNewTag" parameterClass="java.util.HashMap">
+		insert into tb_tag(tag_name,parent_id,create_date,delete_flag)
+		values(#tagName#,#tagId#,(select GETDATE()),1)
+		<selectKey resultClass="Long" type="post">
+			select @@IDENTITY as
+			value
+		</selectKey>
+	</insert>
+	<update id="updateTheTag" parameterClass="java.util.HashMap">
+		update tb_tag set tag_name=#tagName# where tag_id=#tagId#
+	</update>
+	<update id="deleteTheTag" parameterClass="java.util.HashMap">
+	update tb_tag set delete_flag=2 where tag_id=#tagId# or parent_id=#tagId# or
+	parent_id in (select tag_id from tb_tag where parent_id=#tagId#)
+	</update>
+
+	<delete id="deleteFromTheProductTag" parameterClass="Long">
+		delete from tb_product_tag where product_id=#productId#
+	</delete>
+	<insert id="addTheNewProductTag" parameterClass="java.util.HashMap">
+		insert into
+		tb_product_tag(product_id,tag_id,add_time)values(#productId#,#tagId#,(select
+		GETDATE()))
+	</insert>
+
+</sqlMap>

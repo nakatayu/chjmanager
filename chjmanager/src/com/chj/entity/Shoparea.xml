@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Shoparea">
+	<typeAlias alias="Shoparea" type="com.chj.entity.Shoparea" />
+	<resultMap class="Shoparea" id="ShopareaRes">
+	    <result property="companyShopAreaId" column="company_shop_area_id" />
+		<result property="companyShopId" column="company_shop_id" />
+		<result property="areaId" column="area_id" />
+	</resultMap>
+
+	<!-- 园区名称保存 -->
+	<insert id="saveShopArea" parameterClass="Shoparea">
+		INSERT INTO tb_company_shop_area(company_shop_id,area_id
+		)
+		VALUES(#companyShopId#, #areaId#
+		)
+		<selectKey keyProperty="companyShopAreaId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+	
+		<!-- 删除已选服务范围，园区名称 -->
+	<delete id="deleteShopArea" parameterClass="java.util.HashMap">
+				delete from tb_company_shop_area where company_shop_id=#companyShopId#
+ 	</delete>
+ 	
+ 	 	<!-- 查找服务范围，园区名称 和 更新服务范围，园区名称 -->
+	<select id="findShopArea" parameterClass="Object" resultClass="java.util.HashMap">
+	 select area_name,a.area_id from tb_company_shop_area t left join tb_area a on t.area_id=a.area_id
+ 			where company_shop_id=#shopId#
+ 	</select>
+ 	
+ 	 	<!-- 删除店铺范围 -->
+ 	<update id="updateShopArea" parameterClass="java.util.HashMap">
+ 		UPDATE tb_company_shop_area  SET delete_flag = 2  WHERE company_shop_id = #shopId#
+ 	</update>
+</sqlMap>

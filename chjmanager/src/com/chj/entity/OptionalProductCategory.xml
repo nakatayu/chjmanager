@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="OptionalProductCategory">
+	<typeAlias alias="OptionalProductCategory"  type="com.chj.entity.OptionalProductCategory" />
+			<resultMap class="OptionalProductCategory" id="OptionalProductCategoryRes">
+			<result property="productShopCategoryId" column="product_shop_category_id" />
+			<result property="name" column="name" />
+			<result property="shopId" column="shop_id" />
+	</resultMap>
+	
+	
+ <!-- 店铺选择商品分类列表 -->
+ <select id="findOptionalCategory"  parameterClass="java.util.HashMap" resultClass="java.util.HashMap">	
+ 			select name,product_shop_category_id from tb_product_shop_category where shop_id=#shopId# and delete_flag!=2
+ </select> 
+ 
+ 
+ <select id="findProductShop" parameterClass="java.util.HashMap" resultClass="java.util.HashMap">
+	select p.name productName, p.product_id productId, pav.name
+	skuName,pav.product_attribute_value_id skuId from tb_product p left
+	join tb_product_attribute pa on p.product_id=pa.product_id left join
+	tb_product_attribute_value pav on
+	pav.product_attribute_id=pa.product_attribute_id
+	where pav.name is not null and p.company_id=#companyId#
+</select>
+
+ </sqlMap>

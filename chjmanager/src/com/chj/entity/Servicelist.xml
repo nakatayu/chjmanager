@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="Servicelist">
+	<typeAlias alias="Servicelist" type="com.chj.entity.Servicelist" />
+	<resultMap class="Servicelist" id="ServicelistRes">
+		<result property="title" column="title" />
+		<result property="serviceId" column="service_id" />
+		<result property="serviceType" column="service_type" />
+		<result property="content" column="content" />
+		<result property="phone" column="phone" />
+		<result property="image" column="image" />
+		<result property="companyId" column="company_id" />
+		<result property="examineResult" column="examine_result" />
+		<result property="status" column="status" />
+		<result property="summary" column="summary" />
+	</resultMap>
+
+	<!--企业 共享漕河泾显示 -->
+	<select id="findCompanyServiceList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by
+		service_id
+		desc)rowId ,*
+		from (select top ($startIndex$+$size$) * from tb_service
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="companyId">
+				(company_id=
+				#companyId#) and delete_flag=1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceTypeList">
+				(CONVERT(varchar,service_type,120)LIKE '%$serviceTypeList$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceStatus">
+				(CONVERT(varchar,status,120)LIKE '%$serviceStatus$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceKeyWord">
+				(title like
+				'%$serviceKeyWord$%')
+			</isNotEmpty>
+		</dynamic>
+		order by service_id desc)ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+	<!--企业 共享漕河泾总数 -->
+	<select id="findCompanyServiceListCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_service
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="companyId">
+				(company_id=
+				#companyId#) and delete_flag=1
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceTypeList">
+				(CONVERT(varchar,service_type,120)LIKE '%$serviceTypeList$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceStatus">
+				(CONVERT(varchar,status,120)LIKE '%$serviceStatus$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceKeyWord">
+				(title like
+				'%$serviceKeyWord$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+
+	<!--开发区 共享漕河泾列表 -->
+	<select id="findChjServiceList" resultClass="java.util.HashMap"
+		parameterClass="java.util.HashMap">
+		select top $size$ * from (select row_number()over(order by 
+		examineResult desc, service_id	desc)rowId ,*
+		from (select top ($startIndex$+$size$) * from ( select
+		s.delete_flag, c.name, s.company_id, s.content, s.title, s.image,
+		s.phone, s.service_id, s.service_type, s.release_time, s.status,
+		s.examine_result as examineResult, s.first_phone_extend,
+		s.relation_phone_extend, s.tui_order from tb_service s
+		left join
+		tb_company c on
+		s.company_id=c.company_id
+		)e where delete_flag!=2
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyId">
+				company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceTypeList">
+				(CONVERT(varchar,service_type,120)LIKE '%$serviceTypeList$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceStatus">
+				(CONVERT(varchar,examineResult,120)LIKE '%$serviceStatus$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceKeyWord">
+				(title like
+				'%$serviceKeyWord$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+			<isNotEmpty>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(
+					first_phone_extend>0 or relation_phone_extend>0 or tui_order>0 )
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+		order by examineResult desc, service_id desc)ss ) sss where
+		sss.rowId > $startIndex$
+	</select>
+
+
+
+	<!-- 开发区 共享漕河泾总数 -->
+	<select id="findChjServiceListCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from ( select s.delete_flag, c.name, s.company_id,
+		s.content, s.title, s.image, s.phone, s.service_id, s.service_type,
+		s.release_time, s.status, s.first_phone_extend,
+		s.relation_phone_extend, s.tui_order from tb_service s
+		left join
+		tb_company c on s.company_id=c.company_id
+		)e where delete_flag!=2
+		<dynamic>
+			<isNotEmpty prepend="AND" property="companyId">
+				company_id=#companyId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceTypeList">
+				(CONVERT(varchar,service_type,120)LIKE '%$serviceTypeList$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceStatus">
+				(CONVERT(varchar,status,120)LIKE '%$serviceStatus$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="serviceKeyWord">
+				(title like
+				'%$serviceKeyWord$%')
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+			<isNotEmpty>
+				<isEqual prepend="AND" compareValue="1" property="top">
+					(
+					first_phone_extend>0 or relation_phone_extend>0 or tui_order>0 )
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+	<!--共享漕河泾状态更改 -->
+	<update id="updateServiceStatus" parameterClass="java.util.HashMap">
+		update
+		tb_service set examine_result = #examineResult# where
+		service_id=#serviceId#
+	</update>
+
+
+	<!-- 开发区 分页 -->
+	<select id="findCompanyServiceList1" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_service where service_id=#serviceId#
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<!-- 分页 -->
+	<select id="queryserviceCompanyCount" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select count(*) from tb_service where service_id=#serviceId#
+		<dynamic prepend="AND">
+			<isNotEmpty prepend="AND" property="name">
+				(NAME like '%$name$%')
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+
+
+	<!-- 刪除共享漕河泾 -->
+	<update id="deleteServicelist" parameterClass="java.util.HashMap">
+		UPDATE tb_service
+		SET delete_flag=2 WHERE service_id=#serviceId#
+	</update>
+
+
+
+	<!-- 添加共享漕河泾 1审核通过2审核不通过3未审核 4关闭 -->
+	<insert id="instServicelist" parameterClass="Servicelist">
+		INSERT INTO tb_service(
+		<isNotEmpty property="title">
+			title
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceType">
+			service_type
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="releaseTime">
+			release_time
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			phone
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="image">
+			image
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="summary">
+			summary
+		</isNotEmpty>
+		,delete_flag,status,examine_result
+		)
+		VALUES(
+		<isNotEmpty property="title">
+			#title#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceType">
+			#serviceType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="releaseTime">
+			#releaseTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			#phone#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="image">
+			#image#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="summary">
+			#summary#
+		</isNotEmpty>
+		,1,#status#,#examineResult#
+		)
+		<selectKey keyProperty="serviceId" resultClass="long" type="post">
+			select @@IDENTITY as value
+		</selectKey>
+	</insert>
+
+	<!-- 查找共享漕河泾 -->
+
+	<select id="findServiceInfo" parameterClass="Servicelist"
+		resultClass="java.util.HashMap">
+		select summary, title, service_type, company_id, content,
+		release_time, phone,image, delete_flag, status
+		from tb_service where
+		service_id = #serviceId# and delete_flag!=2
+	</select>
+
+	<!-- 更新 -->
+	<update id="updateServiceInfo" parameterClass="Servicelist">
+		UPDATE tb_service
+		SET
+		<isNotEmpty property="title">
+			title =#title#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="summary">
+			summary=#summary#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="serviceType">
+			service_type
+			=#serviceType#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="content">
+			content =#content#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="phone">
+			phone =#phone#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="image">
+			image=#image#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="releaseTime">
+			release_time=#releaseTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="companyId">
+			company_id=#companyId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="examineResult">
+			examine_result=#examineResult#
+		</isNotEmpty>
+		WHERE service_id = #serviceId#
+	</update>
+	<!-- 删除企业下的服务信息 共享漕河泾 -->
+	<update id="deleteCompanyServiceInfo" parameterClass="java.util.HashMap">
+		UPDATE
+		tb_service SET delete_flag = 2 WHERE company_id =#companyId#
+	</update>
+	<!--开发区后台 共享漕河泾 审核状态关闭或开启 -->
+	<update id="serviceInfoCloseOrOpen" parameterClass="java.util.HashMap">
+		update
+		tb_service set status=#status#,examine_result=#examineResult# where
+		service_id=#serviceId# and delete_flag = 1
+	</update>
+
+	<select id="findServiceStatua" parameterClass="java.util.HashMap"
+		resultClass="Long">
+		select status from tb_service where service_id =
+		#serviceId# and delete_flag
+		= 1
+	</select>
+
+	<select id="queryNumService" parameterClass="java.util.HashMap"
+		resultClass="Integer">
+		select count(*) from tb_service where $filName$>0 and
+		delete_flag!=2
+		and examine_result!=2
+		<isNotEqual compareValue="0" prepend="AND" property="type">
+			service_type=#type#
+		</isNotEqual>
+	</select>
+	<update id="updServiceRelation" parameterClass="java.util.HashMap">
+		update tb_service set
+		$filName$=#filValue# where service_id=#serviceId#
+		<isNotEqual compareValue="0" prepend="AND" property="type">
+			service_type=#type#
+		</isNotEqual>
+	</update>
+</sqlMap>

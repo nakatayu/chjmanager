@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+  
+<!DOCTYPE sqlMap         
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"         
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="OrderItem">
+
+	<typeAlias alias="OrderItem" type="com.chj.entity.OrderItem" />
+	<resultMap class="OrderItem" id="OrderItemRes">
+		<result property="orderItemId" column="order_item_id" />
+		<result property="productSkuId" column="product_sku_id" />
+		<result property="orderId" column="order_id" />
+		<result property="productId" column="product_id" />
+		<result property="qty" column="qty" />
+		<result property="total" column="total" />
+		<result property="price" column="price" />
+		<result property="companyShopProductId" column="company_shop_product_id" />
+		<result property="companyShopProductSkuId" column="company_shop_product_sku_id" />
+		
+		<result property="productName" column="product_id"  select="selectOrderItemProductNameById"/>
+		<result property="skuKind" column="product_sku_id"  select="selectProductSkuKindById"/>
+	</resultMap>
+	
+	<typeAlias alias="OrderItemAppend" type="com.chj.entity.OrderItemAppend" />
+	<resultMap class="OrderItemAppend" id="OrderItemAppendRes">
+		<result property="orderItemId" column="order_item_id" />
+		<result property="qty" column="qty" />
+		<result property="total" column="total" />
+		<result property="price" column="price" />
+		<result property="appendInfo" column="append_id" select="selectAppendInfo"/>
+		<result property="parentName" column="append_id" select="selectParentNameById"/>
+	</resultMap>
+<select id="selectOrderItemProductNameById" parameterClass="Long" resultClass="String">
+select name from tb_product where product_id=#value#
+</select>
+<select id="selectProductSkuKindById" parameterClass="Long" resultClass="String">
+select sku_kind from tb_product_sku where product_sku_id=#value#
+</select>
+	<select id="selectOrderItemList" parameterClass="java.util.HashMap" resultMap="OrderItemRes">
+		 select top $size$ * from (select row_number()over(order by
+		order_item_id)rowId,*
+   from (select top ($startIndex$+$size$) * from tb_order_item 
+   where order_id=#orderId#
+   order by order_item_id) ss
+   )sss
+   where sss.rowId>$startIndex$
+	</select>
+<select id="selectOrderItemListCount" parameterClass="java.util.HashMap"  resultClass="Long">
+select count(*) from tb_order_item 
+   where order_id=#orderId#
+</select>
+
+	<select id="findOrderAppendItem" parameterClass="Long"
+		resultMap="OrderItemAppendRes">
+		select * from tb_order_item_append where order_item_id=#value#
+	</select>
+	<select id="selectParentNameById" parameterClass="Long"
+		resultClass="String">
+		select name
+		from tb_append where append_id in(select parent_id from tb_append where append_id=#value#)
+	</select>
+	<select id="selectAppendInfo" parameterClass="Long"
+		resultClass="java.util.HashMap">
+		select name,is_ckeckbox as isCheckbox
+		from tb_append where append_id =#value#
+	</select>
+	
+</sqlMap>
